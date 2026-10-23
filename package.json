@@ -1,11 +1,14 @@
 {
   "name": "@coded-design/null-invaders",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "type": "module",
   "description": "Null Invaders: a tiny MIT-licensed DOM arcade game by coded.design",
   "license": "MIT",
   "author": "Chris Cooley",
-  "sideEffects": false,
+  "sideEffects": [
+    "./site-kit/**",
+    "./site/**"
+  ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -29,17 +32,22 @@
     "url": "https://github.com/coded-dot-design/null-invaders.git"
   },
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.23.4"
   },
   "scripts": {
-    "dev": "vite --config vite.config.js",
+    "dev": "node site/shared/scripts/prepare.mjs && astro dev --config site/astro.config.mjs",
     "build": "node scripts/build.mjs",
     "test": "node --import tsx --test tests/*.test.mjs",
     "check": "npm run typecheck && npm test && npm run build && npm run test:package",
     "playground:build": "vite build --config vite.config.js",
     "size": "node scripts/size.mjs",
     "typecheck": "tsc --noEmit",
-    "test:package": "tsc -p tsconfig.package.json"
+    "test:package": "tsc -p tsconfig.package.json",
+    "dev:playground": "vite --config vite.config.js",
+    "site:prepare": "node site/shared/scripts/prepare.mjs",
+    "site:build": "npm run site:typecheck && node site/shared/scripts/prepare.mjs && astro build --config site/astro.config.mjs && node site/shared/scripts/verify.mjs",
+    "site:preview": "astro preview --config site/astro.config.mjs",
+    "site:typecheck": "tsc -p site/shared/tsconfig.json"
   },
   "peerDependencies": {
     "react": "^18.2.0 || ^19.0.0"
@@ -54,6 +62,7 @@
     "vite": "8.3.5",
     "typescript": "7.0.2",
     "tsx": "4.23.15",
-    "@types/react": "19.3.0"
+    "@types/react": "19.3.0",
+    "astro": "7.4.2"
   }
 }

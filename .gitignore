@@ -2,3 +2,7 @@ node_modules/
 artifacts/
 *.tgz
 .DS_Store
+
+site/generated/
+site/.astro/
+.astro/

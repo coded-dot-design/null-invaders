@@ -1,5 +1,30 @@
 # Null Invaders · coded.design
 
+## Play and develop the Astro site
+
+Product page: https://coded-dot-design.github.io/null-invaders/ (available after Pages is enabled and the deployment succeeds). Created by **Chris Cooley / coded.design**.
+
+Use Node **24** (`nvm use`), then run from this repository, where `package.json` lives:
+
+```sh
+npm ci
+npm run dev
+```
+
+Open the exact local URL Astro prints, including the `/null-invaders/` base path. `npm ci` uses the committed lockfile. `npm run dev:playground` keeps the original Vite regression playground available. The product site loads built game distributions; after editing game source, run `npm run build` and restart `npm run dev`.
+
+```sh
+npm run check
+npm run site:build
+npm run site:preview
+```
+
+`site:build` writes static output to `artifacts/site` and checks the launch script, styles and Pages asset paths. Pages builds run on every push to `main`; PR checks also build the product site. One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**. No custom domain or paid hosting is required for this public repository. If the deploy job ran before enabling Pages, rerun that failed job afterward.
+
+The page defaults to your system color scheme, with persistent light/dark overrides. Game launches are explicit and lazy-loaded. Recall destroys the active controller and restores eligible game-owned edits. Menu controls, code examples and the launcher are excluded from game targets.
+
+
+
 **The page is the game board.** A small, independent MIT-licensed DOM arcade game in the DOM VIRUS collection.
 
 Fly a tiny interceptor through a real webpage. Shoot letters into binary, destroy button factories, and clear the aliens they release. Combat XP upgrades your weapon during a wave: Pulse, Twin, Trident, then four-shot Overdrive. Three lives; finishing wave four clears the page. Factories reactivate between waves.

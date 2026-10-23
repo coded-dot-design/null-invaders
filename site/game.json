@@ -1,0 +1,65 @@
+{
+  "id": "null-invaders",
+  "author": "Chris Cooley",
+  "license": "MIT",
+  "name": "Null Invaders",
+  "kind": "DOM SHOOTER",
+  "tagline": "Delete the invasion.",
+  "description": "Fly an interceptor through a real webpage. Turn letters into binary, break the button factories, and clear the aliens they release.",
+  "accent": "cyan",
+  "icon": "ship",
+  "versionNote": "Four waves. One page. Increasing firepower.",
+  "controls": [
+    "Mouse / WASD / arrows \u2014 fly and aim",
+    "Click / Space \u2014 fire",
+    "P \u2014 pause \u00b7 G \u2014 next factory \u00b7 Esc \u2014 Recall"
+  ],
+  "facts": [
+    {
+      "value": "4",
+      "label": "weapon tiers"
+    },
+    {
+      "value": "48",
+      "label": "alien cap"
+    },
+    {
+      "value": "80",
+      "label": "bullet cap"
+    }
+  ],
+  "loop": [
+    "Shoot letters",
+    "Earn combat XP",
+    "Upgrade the ship",
+    "Destroy factories"
+  ],
+  "chapters": [
+    {
+      "title": "Every heading is cover. Every button is a factory.",
+      "body": "Bullets travel through viewport space and collide with cached text geometry. A letter can be hit once: its original glyph is concealed and a 0 or 1 appears in the same place, matching the page\u2019s font, weight and color. Button health drains through a liquid fill. A destroyed factory stops spawning for the rest of that wave."
+    },
+    {
+      "title": "Get stronger during the fight.",
+      "body": "Pulse starts with one shot. Twin unlocks at 8 XP, Trident at 24, and four-shot Overdrive at 50. Letters give 1 XP, aliens 4, factory hits 2, and a destroyed factory another 8. Fire cadence accelerates from 160 ms to 95 ms. Weapon pods appear on the interceptor as it upgrades."
+    },
+    {
+      "title": "A tiny cast, built from pixels.",
+      "body": "Three original alien silhouettes use two-frame animation. The interceptor gains weapon pods, engine flicker and a temporary shield. Art is baked into 15 \u00d7 16 canvas tiles and reused with image smoothing disabled. No image downloads, sprite DOM nodes or animation library."
+    },
+    {
+      "title": "Fast shots still hit thin letters.",
+      "body": "A swept segment test checks the path from the previous bullet position to the next. The nearest intersecting glyph, alien or factory wins, so a fast projectile cannot simply jump across a narrow letter between frames. Alien and bullet objects are recycled through bounded pools."
+    }
+  ],
+  "code": "const game = createNullInvaders({\n  root: \"main\",\n  textSelector: \"h1, h2, p\",\n  targetSelector: \"[data-factory]\",\n  binaryStyle: \"native\",\n  targetEffects: \"liquid\",\n});\ngame.start();\n// Later: game.destroy();",
+  "importLine": "import { createNullInvaders } from \"@coded-design/null-invaders\";",
+  "engine": "Shared TypeScript runtime",
+  "extra": "Three shields. Four waves. Factories reactivate between waves. Chained kills build a multiplier up to \u00d75; losing a shield resets the combo, but keeps your weapon.",
+  "sourcePaths": [
+    "src/simulation.ts",
+    "src/sprites.ts",
+    "src/rules.ts",
+    "shared/ORIGIN.json"
+  ]
+}
