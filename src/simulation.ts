@@ -1,4 +1,45 @@
-import { clamp, distance, segmentHit } from "@coded-design/dom-virus";
+import type {
+  GameContext,
+  GameSimulation,
+  GameStats,
+  Player,
+  Point,
+  Glyph,
+  BoardTarget,
+} from "@coded-design/dom-virus";
+interface Enemy extends Point {
+  age: number;
+  type: number;
+  phase: number;
+  hp: number;
+}
+interface Bullet extends Point {
+  vx: number;
+  vy: number;
+  life: number;
+}
+export interface NullInvadersStats extends GameStats {
+  score: number;
+  lives: number;
+  wave: number;
+  kills: number;
+  alive: number;
+  bullets: number;
+  weapon: number;
+  player: Player;
+  detail: string;
+}
+type Collision =
+  | { kind: "glyph"; target: Glyph }
+  | { kind: "enemy"; target: Enemy }
+  | { kind: "gate"; target: BoardTarget };
+import {
+  distance,
+  segmentHit,
+  EntityPool,
+  chooseSpawn,
+  translateEntities,
+} from "@coded-design/dom-virus";
 import {
   MAX_ENEMIES,
   MAX_BULLETS,
@@ -7,13 +48,29 @@ import {
   waveHealth,
 } from "./rules.js";
 
-export function createGame(api) {
-  let player,
-    enemies = [],
-    bullets = [],
-    enemyPool = [],
-    bulletPool = [],
-    score = 0,
+export function createGame(
+  api: GameContext,
+): GameSimulation<NullInvadersStats> {
+  let player: Player = { x: 0, y: 0, angle: 0 };
+  const enemyPool = new EntityPool<Enemy>(MAX_ENEMIES, () => ({
+    x: 0,
+    y: 0,
+    age: 0,
+    type: 0,
+    phase: 0,
+    hp: 0,
+  }));
+  const bulletPool = new EntityPool<Bullet>(MAX_BULLETS, () => ({
+    x: 0,
+    y: 0,
+    vx: 0,
+    vy: 0,
+    life: 0,
+  }));
+  const enemies = enemyPool.active,
+    bullets = bulletPool.active;
+  const old: Point = { x: 0, y: 0 };
+  let score = 0,
     lives = 3,
     wave = 1,
     kills = 0,
@@ -22,29 +79,25 @@ export function createGame(api) {
     shield = 2,
     intermission = 0;
   const spawn = () => {
-    const gates = api.board.targets.filter((t) => t.health > 0 && t.visible);
-    if (api.board.targets.length && !gates.length) return;
-    if (enemies.length >= MAX_ENEMIES) return;
-    const gate = gates[Math.floor(api.random() * gates.length)],
-      rect = gate?.rect;
-    const e = enemyPool.pop() || {};
+    if (enemyPool.size >= MAX_ENEMIES) return;
+    const spawn = chooseSpawn(api.board.targets, api.random, api.width);
+    if (!spawn) return;
+    const e = enemyPool.acquire();
+    if (!e) return;
     Object.assign(e, {
-      x: rect ? (rect.left + rect.right) / 2 : api.random() * api.width,
-      y: rect ? (rect.top + rect.bottom) / 2 : 8,
+      x: spawn.x,
+      y: spawn.y,
       age: 0,
       type: Math.floor(api.random() * Math.min(3, wave)),
       phase: api.random() * 6.28,
       hp: wave >= 3 ? 2 : 1,
     });
-    enemies.push(e);
-    api.emit("spawn", { target: gate?.id });
+    api.emit("spawn", { target: spawn.target?.id });
   };
   const reset = () => {
     player = { x: api.width * 0.5, y: api.height * 0.7, angle: -Math.PI / 2 };
-    enemies = [];
-    bullets = [];
-    enemyPool = [];
-    bulletPool = [];
+    enemyPool.clear();
+    bulletPool.clear();
     score = 0;
     lives = 3;
     wave = 1;
@@ -55,7 +108,7 @@ export function createGame(api) {
     intermission = 0;
     api.board.resetTargets(waveHealth(wave));
   };
-  function update(dt) {
+  function update(dt: number) {
     shield = Math.max(0, shield - dt);
     api.move(player, dt, 360);
     if (intermission > 0) {
@@ -79,8 +132,9 @@ export function createGame(api) {
       shotIn = wave === 4 ? 0.12 : 0.19;
       for (const offset of weaponAngles(wave)) {
         if (bullets.length >= MAX_BULLETS) break;
-        const b = bulletPool.pop() || {},
-          a = player.angle + offset;
+        const b = bulletPool.acquire();
+        if (!b) break;
+        const a = player.angle + offset;
         Object.assign(b, {
           x: player.x + Math.cos(a) * 16,
           y: player.y + Math.sin(a) * 16,
@@ -88,19 +142,20 @@ export function createGame(api) {
           vy: Math.sin(a) * 660,
           life: 1.5,
         });
-        bullets.push(b);
       }
     }
     for (let i = bullets.length - 1; i >= 0; i--) {
-      const b = bullets[i],
-        old = { x: b.x, y: b.y };
+      const b = bullets[i]!;
+      old.x = b.x;
+      old.y = b.y;
       b.x += b.vx * dt;
       b.y += b.vy * dt;
       b.life -= dt;
-      let hit = api.board.hitSegment(old, b),
-        nearest = hit?.t ?? Infinity,
-        kind = hit ? "glyph" : null,
-        target = hit?.glyph;
+      const hit = api.board.hitSegment(old, b);
+      let nearest = hit?.t ?? Infinity;
+      let collision: Collision | null = hit
+        ? { kind: "glyph", target: hit.glyph }
+        : null;
       for (const e of enemies) {
         const t = segmentHit(
           old,
@@ -110,42 +165,44 @@ export function createGame(api) {
         );
         if (t !== null && t < nearest) {
           nearest = t;
-          kind = "enemy";
-          target = e;
+          collision = { kind: "enemy", target: e };
         }
       }
       for (const gate of api.board.targets)
-        if (gate.visible && gate.health > 0) {
+        if (gate.visible && gate.health > 0 && gate.rect) {
           const t = segmentHit(old, b, gate.rect, 2);
           if (t !== null && t < nearest) {
             nearest = t;
-            kind = "gate";
-            target = gate;
+            collision = { kind: "gate", target: gate };
           }
         }
-      if (kind) {
+      if (collision) {
         const x = old.x + (b.x - old.x) * nearest,
           y = old.y + (b.y - old.y) * nearest;
-        if (kind === "glyph" && api.board.consume(target, "binary")) {
+        if (
+          collision.kind === "glyph" &&
+          api.board.consume(collision.target, "binary")
+        ) {
           score += 2;
           api.burst(x, y, "#5ef2df", 5);
           api.emit("letter", { score });
         }
-        if (kind === "enemy") {
+        if (collision.kind === "enemy") {
+          const target = collision.target;
           target.hp--;
           api.burst(x, y, "#f18eff", 6);
           if (target.hp <= 0) {
             const ix = enemies.indexOf(target);
             if (ix >= 0) {
-              enemies.splice(ix, 1);
-              enemyPool.push(target);
+              enemyPool.releaseAt(ix);
               score += 25;
               kills++;
               api.emit("kill", { score });
             }
           }
         }
-        if (kind === "gate") {
+        if (collision.kind === "gate") {
+          const target = collision.target;
           api.board.damage(target, 20);
           api.burst(x, y, "#ffaf7a", 8);
           if (target.health === 0) {
@@ -155,19 +212,18 @@ export function createGame(api) {
         }
       }
       if (
-        kind ||
+        collision ||
         b.life <= 0 ||
         b.x < -30 ||
         b.y < -30 ||
         b.x > api.width + 30 ||
         b.y > api.height + 30
       ) {
-        bullets.splice(i, 1);
-        bulletPool.push(b);
+        bulletPool.releaseAt(i);
       }
     }
     for (let i = enemies.length - 1; i >= 0; i--) {
-      const e = enemies[i];
+      const e = enemies[i]!;
       e.age += dt;
       const a = Math.atan2(player.y - e.y, player.x - e.x),
         speed = 45 + wave * 13 + e.type * 12;
@@ -178,8 +234,7 @@ export function createGame(api) {
         lives--;
         shield = 2;
         api.burst(player.x, player.y, "#ff896f", 18);
-        enemies.splice(i, 1);
-        enemyPool.push(e);
+        enemyPool.releaseAt(i);
         api.emit("hurt", { lives });
         if (lives <= 0) {
           api.finish();
@@ -191,8 +246,7 @@ export function createGame(api) {
         e.x < -api.width ||
         e.x > api.width * 2
       ) {
-        enemies.splice(i, 1);
-        enemyPool.push(e);
+        enemyPool.releaseAt(i);
       }
     }
     const cleared = api.board.targets.length
@@ -205,11 +259,11 @@ export function createGame(api) {
       }
       intermission = 2;
       score += 250;
-      bullets.length = 0;
+      bulletPool.clear();
       api.emit("wave-clear", { wave });
     }
   }
-  function draw(ctx) {
+  function draw(ctx: CanvasRenderingContext2D) {
     for (const t of api.board.targets)
       if (t.visible && t.rect) {
         const r = t.rect;
@@ -254,7 +308,7 @@ export function createGame(api) {
       ctx.translate(e.x, e.y);
       ctx.strokeStyle = "#180f27";
       ctx.lineWidth = 3;
-      ctx.fillStyle = ["#dc91ff", "#ff8da2", "#ffc480"][e.type];
+      ctx.fillStyle = ["#dc91ff", "#ff8da2", "#ffc480"][e.type] ?? "#dc91ff";
       const flap = api.reducedMotion ? 3 : Math.sin(e.age * 10 + e.phase) * 4;
       ctx.beginPath();
       ctx.moveTo(-13, flap);
@@ -310,10 +364,8 @@ export function createGame(api) {
     update,
     draw,
     scroll(dx, dy) {
-      for (const e of [...enemies, ...bullets]) {
-        e.x -= dx;
-        e.y -= dy;
-      }
+      translateEntities(enemies, dx, dy);
+      translateEntities(bullets, dx, dy);
     },
     snapshot() {
       return {

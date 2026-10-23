@@ -1,5 +1,1 @@
-import type { GameOptions } from "./types.js";
-export declare function NullInvaders(props: {
-  active?: boolean;
-  options?: GameOptions;
-}): null;
+export declare const NullInvaders: (props: import("./core/react.js").GameComponentProps<import("./simulation.js").NullInvadersStats>) => null;

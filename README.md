@@ -39,7 +39,7 @@ The import is deferred until the player clicks. Keep the MIT license with redist
 ## npm-compatible install
 
 ```sh
-npm install github:coded-dot-design/null-invaders#v0.1.0
+npm install github:coded-dot-design/null-invaders#v0.2.0
 ```
 
 ```js
@@ -51,13 +51,13 @@ game.start();
 // game.pause(); game.resume(); game.stop(); game.destroy();
 ```
 
-The npm-compatible package exports its prebuilt self-contained module. You do not need to install DOM VIRUS or any other game at runtime. The package name is reserved in this source; npm registry availability is not claimed.
+The npm-compatible package exports its prebuilt self-contained module. You do not need to install DOM VIRUS or any other game at runtime. The package uses this scoped name; npm registry availability is not claimed.
 
 ## Configure the board
 
 ```js
 const game = createNullInvaders({
-  root: document.querySelector('main'),
+  root: 'main',
   textSelector: '[data-virus-text]',
   targetSelector: '[data-virus-target]',
   excludeSelector: '[data-virus-ignore]',
@@ -96,13 +96,14 @@ Mouse or arrows/WASD: move and aim in the direction of travel. Hold click or Spa
 ## Develop and verify
 
 ```sh
+npm run typecheck
 npm test
 npm run build
 npm run size
 npm run playground:build
 ```
 
-`src/simulation.js` owns gameplay. `src/rules.js` owns balance constants. `src/index.js` exposes the factory. The runtime source is maintained once in DOM VIRUS. This repository includes a generated, versioned `shared/core.js` snapshot with its source fingerprint in `shared/ORIGIN.json`; do not edit that generated file. Builds use the snapshot, so this repo works independently. A sibling `dom-virus` checkout enables source iteration and refreshes the snapshot when you rebuild. A runtime update never silently changes a released game.
+`src/simulation.ts` owns gameplay. `src/rules.ts` owns balance constants. `src/index.ts` exposes the factory. The engine, shared entity pools, factory selection and React lifecycle adapter are maintained once in DOM VIRUS. All engine and game implementation sources use strict TypeScript. Generated declarations preserve game-specific snapshot fields and ship with the package; the browser receives plain JavaScript. This repository includes a generated, versioned `shared/core.js` snapshot with its source fingerprint in `shared/ORIGIN.json`; do not edit that generated file. Builds use the snapshot, so this repo works independently. A sibling `dom-virus` checkout enables live source iteration in Vite. To refresh the engine snapshot, run `npm run sync:games` in that checkout, then rebuild this game. A game build never silently replaces its pinned snapshot. A runtime update never silently changes a released game.
 
 The regular distribution is budgeted below **18 KB gzip including its runtime**. Runtime entities and geometry work are capped. Tests and Vite never ship in the package. See [shared performance notes](https://github.com/coded-dot-design/dom-virus/blob/main/PERFORMANCE.md) and [reference study](https://github.com/coded-dot-design/dom-virus/blob/main/REFERENCES.md).
 
@@ -114,4 +115,4 @@ MIT © 2026 Chris Cooley. Original character artwork is procedural and included 
 
 ## Version tags
 
-After checks pass on `main`, CI creates the tag matching `package.json` (for example `v0.1.0`) if it does not already exist. Existing tags never move. Bump the package version for the next release.
+After checks pass on `main`, CI creates the tag matching `package.json` (for example `v0.2.0`) if it does not already exist. Existing tags never move. Bump the package version for the next release.

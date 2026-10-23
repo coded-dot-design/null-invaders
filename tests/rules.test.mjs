@@ -6,7 +6,7 @@ import {
   waveHealth,
   MAX_ENEMIES,
   MAX_BULLETS,
-} from "../src/rules.js";
+} from "../src/rules.ts";
 test("four waves advance from single to twin, spread and overdrive", () =>
   assert.deepEqual(
     [1, 2, 3, 4].map((n) => weaponAngles(n).length),
