@@ -2,7 +2,23 @@
 
 **The page is the game board.** A small, independent MIT-licensed DOM arcade game in the DOM VIRUS collection.
 
-Fly a tiny interceptor through a real webpage. Shoot letters into binary, destroy button factories, and clear the aliens they release. Four waves upgrade your weapon: single, twin, three-way spread, then four-shot overdrive. Three lives; finishing wave four clears the page. Factories reactivate between waves.
+Fly a tiny interceptor through a real webpage. Shoot letters into binary, destroy button factories, and clear the aliens they release. Combat XP upgrades your weapon during a wave: Pulse, Twin, Trident, then four-shot Overdrive. Three lives; finishing wave four clears the page. Factories reactivate between waves.
+
+## The 0.3 shooter pass
+
+- Original two-frame pixel aliens, an animated interceptor, visible weapon pods, and brief enemy hit feedback. Sprites are baked into tiny canvas tiles once, then reused.
+- Swarm-inspired six-digit score panel, floating points, kill/active counters, combo scoring, and a weapon XP meter. Light/dark themes follow system preferences.
+- Button factories drain through cyan/native color, yellow and pink health states, with liquid impact ripples and slowing beacon rings. Labels, icons and handlers stay in place; Recall restores owned style properties.
+- Shot letters become clean, unshootable 0/1 glyphs in the page's font, weight and color. The default visual mode preserves framework-owned text nodes. Static pages can still choose direct text mutation.
+
+| Gun | Unlock | Pattern |
+| --- | ---: | --- |
+| Pulse | Start | Single shot, 160 ms cadence |
+| Twin | 8 XP | Twin shot, 140 ms cadence |
+| Trident | 24 XP | Three-way spread, 120 ms cadence |
+| Overdrive | 50 XP | Four-way spread, 95 ms cadence |
+
+A letter gives 1 XP, an alien 4 XP, a factory hit 2 XP, a destroyed factory another 8 XP, and a wave clear 4 XP. Upgrades last for the run and reset on Restart. Three chained alien kills increase the combo multiplier, up to ×5; hits on letters keep the three-second combo window open. Losing a shield clears the combo.
 
 ## Run locally
 
@@ -39,7 +55,7 @@ The import is deferred until the player clicks. Keep the MIT license with redist
 ## npm-compatible install
 
 ```sh
-npm install github:coded-dot-design/null-invaders#v0.2.0
+npm install github:coded-dot-design/null-invaders#v0.3.0
 ```
 
 ```js
@@ -63,6 +79,8 @@ const game = createNullInvaders({
   excludeSelector: '[data-virus-ignore]',
   theme: 'system',
   domMode: 'visual',
+  binaryStyle: 'native', // page font, weight and color; no neon outline
+  targetEffects: 'liquid', // native button health fill + short hit ripple
   onState: snapshot => console.log(snapshot.status, snapshot.score),
 });
 ```
@@ -89,9 +107,9 @@ Set `playing` from a user action. The adapter mounts only in an effect, destroys
 
 ## Controls
 
-Mouse or arrows/WASD: move and aim in the direction of travel. Hold click or Space to fire. Arrow/WASD input switches to keyboard control; pointer movement switches back. Touch devices receive a D-pad and auto-fire toggle.
+Mouse or arrows/WASD: move and aim in the direction of travel. Hold click or Space to fire. Arrow/WASD input switches to keyboard control; pointer movement switches back. The HUD has an auto-fire toggle; touch devices also receive a D-pad.
 
-**P** pauses/resumes. **G** jumps to a gate. **Escape** or **Recall** exits and restores the page. The HUD can be folded. Focusing a form field pauses play; modifier shortcuts and typing are not captured. Theme follows the system unless overridden. Reduced-motion preference removes particles and decorative pulses.
+**P** pauses/resumes. **G** jumps to a gate. **Escape** or the HUD’s **×** (Recall) exits and restores the page. The HUD can be folded. Focusing a form field pauses play; modifier shortcuts and typing are not captured. Theme follows the system unless overridden. Reduced-motion preference removes particles, floating motion, sprite animation, hit flashes and decorative pulses; readable score feedback remains.
 
 ## Develop and verify
 
@@ -103,7 +121,7 @@ npm run size
 npm run playground:build
 ```
 
-`src/simulation.ts` owns gameplay. `src/rules.ts` owns balance constants. `src/index.ts` exposes the factory. The engine, shared entity pools, factory selection and React lifecycle adapter are maintained once in DOM VIRUS. All engine and game implementation sources use strict TypeScript. Generated declarations preserve game-specific snapshot fields and ship with the package; the browser receives plain JavaScript. This repository includes a generated, versioned `shared/core.js` snapshot with its source fingerprint in `shared/ORIGIN.json`; do not edit that generated file. Builds use the snapshot, so this repo works independently. A sibling `dom-virus` checkout enables live source iteration in Vite. To refresh the engine snapshot, run `npm run sync:games` in that checkout, then rebuild this game. A game build never silently replaces its pinned snapshot. A runtime update never silently changes a released game.
+`src/simulation.ts` owns gameplay. `src/rules.ts` owns balance constants. `src/index.ts` exposes the factory. The engine, shared entity pools, factory selection and React lifecycle adapter are maintained once in DOM VIRUS. All engine and game implementation sources use strict TypeScript. Generated declarations preserve game-specific snapshot fields and ship with the package; the browser receives plain JavaScript. This repository includes a generated, versioned `shared/core.js` snapshot with its source fingerprint in `shared/ORIGIN.json`; do not edit that generated file. Builds use the snapshot, so this repo works independently. A sibling `dom-virus` checkout enables live source iteration in Vite. To refresh the engine snapshot, run `npm run build:engine && node scripts/sync-games.mjs null-invaders` in that checkout, then rebuild this game. A game build never silently replaces its pinned snapshot. A runtime update never silently changes a released game.
 
 The regular distribution is budgeted below **18 KB gzip including its runtime**. Runtime entities and geometry work are capped. Tests and Vite never ship in the package. See [shared performance notes](https://github.com/coded-dot-design/dom-virus/blob/main/PERFORMANCE.md) and [reference study](https://github.com/coded-dot-design/dom-virus/blob/main/REFERENCES.md).
 
@@ -115,4 +133,4 @@ MIT © 2026 Chris Cooley. Original character artwork is procedural and included 
 
 ## Version tags
 
-After checks pass on `main`, CI creates the tag matching `package.json` (for example `v0.2.0`) if it does not already exist. Existing tags never move. Bump the package version for the next release.
+After checks pass on `main`, CI creates the tag matching `package.json` (for example `v0.3.0`) if it does not already exist. Existing tags never move. Bump the package version for the next release.

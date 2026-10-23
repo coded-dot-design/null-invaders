@@ -4,7 +4,7 @@ export declare class MutationLedger {
     private readonly styles;
     constructor();
     writeText(node: TextNode, value: string): boolean;
-    writeStyle(el: HTMLElement | SVGElement, key: string, value: string): boolean;
+    writeStyle(el: HTMLElement | SVGElement, key: string, value: string, priority?: string): boolean;
     restore(): void;
 }
 export {};

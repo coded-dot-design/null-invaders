@@ -20,8 +20,9 @@ export function createNullInvaders(
       color: "#5ef2df",
       hint: "Move: mouse / WASD · Fire: click / Space · G: next gate",
       capabilities: { fire: true },
+      hud: "arcade",
       create: createGame,
     },
-    options,
+    { binaryStyle: "native", targetEffects: "liquid", ...options },
   );
 }

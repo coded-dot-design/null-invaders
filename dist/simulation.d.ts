@@ -7,6 +7,9 @@ export interface NullInvadersStats extends GameStats {
     alive: number;
     bullets: number;
     weapon: number;
+    weaponXP: number;
+    nextWeaponXP: number | null;
+    combo: number;
     player: Player;
     detail: string;
 }
