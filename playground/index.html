@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><meta name="color-scheme" content="dark light" /><title>
+    Null Invaders — Playground</title
+  ><style>
+    :root {
+      color-scheme: dark light;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font: 17px/1.65 system-ui;
+      margin: 0;
+      background: light-dark(#f0f3e9, #101514);
+      color: light-dark(#18271c, #e1ebdb);
+    }
+    main {
+      max-width: 1000px;
+      margin: auto;
+      padding: 70px 36px;
+    }
+    h1 {
+      font-size: clamp(50px, 7vw, 85px);
+      line-height: 1.04;
+      letter-spacing: -4px;
+    }
+    h2 {
+      font-size: 40px;
+      letter-spacing: -2px;
+    }
+    button {
+      font: inherit;
+      border: 1px solid #8b9e82;
+      border-radius: 30px;
+      padding: 12px 24px;
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+    }
+    .bar {
+      position: sticky;
+      top: 0;
+      padding: 18px 30px;
+      background: light-dark(#f0f3e9, #101514);
+      border-bottom: 1px solid #60705c;
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      z-index: 2;
+    }
+    .bar strong {
+      margin-right: auto;
+    }
+    section {
+      padding: 50px 0;
+      border-bottom: 1px solid #60705c;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+    }
+    p {
+      max-width: 650px;
+      color: light-dark(#4e624b, #a6b59f);
+    }
+    input {
+      font: inherit;
+      padding: 12px;
+      background: transparent;
+      color: inherit;
+      border: 1px solid #60705c;
+    }
+    small {
+      font: 12px monospace;
+    }
+  </style>
+  <div class="bar" data-virus-ignore>
+    <strong>Null Invaders</strong><button id="start">Play ↗</button
+    ><button id="stop">Recall</button>
+  </div>
+  <main id="board">
+    <small>CODED.DESIGN / DOM VIRUS / INDEPENDENT GAME</small>
+    <h1>The page is<br />your playground.</h1>
+    <p>
+      Real words. Real buttons. A tiny arcade world hiding in the document. Move
+      through the content and watch ordinary elements become part of the game.
+    </p>
+    <button>First factory ↗</button>
+    <section>
+      <h2>Make something unexpected.</h2>
+      <div class="grid">
+        <article>
+          <h3>Follow the signal</h3>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. A hundred
+            small observations turn into something entirely new.
+          </p>
+          <button>Open the signal</button>
+        </article>
+        <article>
+          <h3>Keep exploring</h3>
+          <p>
+            Curabitur commodo sapien quis est facilisis, at pulvinar purus
+            fringilla. There is always another place to begin.
+          </p>
+          <button>Another way in</button>
+        </article>
+      </div>
+    </section>
+    <section>
+      <h2>Space to play.</h2>
+      <p>
+        These letters are part of the game. Every paragraph becomes a little
+        landscape of possibility, with room to move and another target waiting
+        around the corner.
+      </p>
+      <p>
+        Donec ut diam euismod, consectetur erat sit amet, ornare orci. Nullam
+        sed dolor sit amet justo fringilla pretium. Suspendisse sit amet pretium
+        lacus.
+      </p>
+      <button>Final transmission</button>
+    </section>
+    <section>
+      <form>
+        <h3>A protected form</h3>
+        <p>This text and these controls are excluded.</p>
+        <input placeholder="Typing stays yours" /><button type="button">
+          Protected button
+        </button>
+      </form>
+    </section>
+  </main>
+  <script type="module">
+    import { createNullInvaders } from "../src/index.js";
+    let game;
+    document.querySelector("#start").onclick = () => {
+      game?.destroy();
+      game = createNullInvaders({ root: document.querySelector("#board") });
+      game.start();
+    };
+    document.querySelector("#stop").onclick = () => game?.destroy();
+    if (import.meta.hot) import.meta.hot.dispose(() => game?.destroy());
+  </script>
+</html>
