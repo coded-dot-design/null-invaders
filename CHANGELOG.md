@@ -1,5 +1,9 @@
 # 0.4.1
 
+## 0.5.2
+
+- Vivid neon sprites and cyan binary highlights; consume movement/fire keys while playing, including when host chrome retains focus.
+
 ## 0.5.1
 
 - Reversible mobile pinch/double-tap zoom lock while playing; native scrolling remains available. Pause and Recall restore the host policy. Set `lockZoom: false` to opt out.

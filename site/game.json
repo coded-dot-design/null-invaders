@@ -10,9 +10,9 @@
   "icon": "ship",
   "versionNote": "Four waves. One page. Increasing firepower.",
   "controls": [
-    "Mouse / WASD / arrows — fly and aim",
-    "Click / Space — fire",
-    "P — pause · G — next factory · Esc — Recall"
+    "Mouse / WASD / arrows \u2014 fly and aim",
+    "Click / Space \u2014 fire",
+    "P \u2014 pause \u00b7 G \u2014 next factory \u00b7 Esc \u2014 Recall"
   ],
   "facts": [
     {
@@ -45,7 +45,7 @@
     },
     {
       "title": "A tiny cast, built from pixels.",
-      "body": "Three original alien silhouettes use two-frame animation. The interceptor gains weapon pods, engine flicker and a temporary shield. Art is baked into 15 × 16 canvas tiles and reused with image smoothing disabled. No image downloads, sprite DOM nodes or animation library."
+      "body": "Three original alien silhouettes use two-frame animation. The interceptor gains weapon pods, engine flicker and a temporary shield. Art is baked into 15 \u00d7 16 canvas tiles and reused with image smoothing disabled. No image downloads, sprite DOM nodes or animation library."
     },
     {
       "title": "Fast shots still hit thin letters.",
@@ -55,7 +55,7 @@
   "code": "const game = createNullInvaders({\n  root: \"main\",\n  textSelector: \"h1, h2, p\",\n  targetSelector: \"[data-factory]\",\n  targetEffects: \"liquid\",\n});\ngame.start();\n// Later: game.destroy();",
   "importLine": "import { createNullInvaders } from \"@coded-design/null-invaders\";",
   "engine": "Shared TypeScript runtime",
-  "extra": "Three shields. Four waves. Factories reactivate between waves. Chained kills build a multiplier up to ×5; losing a shield resets the combo, but keeps your weapon.",
+  "extra": "Three shields. Four waves. Factories reactivate between waves. Chained kills build a multiplier up to \u00d75; losing a shield resets the combo, but keeps your weapon.",
   "sourcePaths": [
     "src/simulation.ts",
     "src/sprites.ts",
@@ -90,6 +90,28 @@
       "role": "Fastest pursuer",
       "rules": "The fastest of the three alien shapes. Health rises with the wave, just like the other aliens; keep moving while firing.",
       "color": ""
+    }
+  ],
+  "palette": [
+    {
+      "label": "Ship / bits",
+      "color": "#00e5ff"
+    },
+    {
+      "label": "Drone",
+      "color": "#a855ff"
+    },
+    {
+      "label": "Crab",
+      "color": "#ff168f"
+    },
+    {
+      "label": "Squid",
+      "color": "#ffea00"
+    },
+    {
+      "label": "Danger",
+      "color": "#ff343b"
     }
   ]
 }
