@@ -49,10 +49,10 @@ const art: Record<Sprite, readonly string[]> = {
   ],
 };
 const palettes: Record<Sprite, readonly string[]> = {
-  ship: ["", "#092331", "#5ee6d6", "#efffff", "#ffb96b"],
-  drone: ["", "#261634", "#b89aff", "#fff1ff", "#ffb96b"],
-  crab: ["", "#321623", "#ff82aa", "#fff6d6", "#ffb96b"],
-  squid: ["", "#32200f", "#ffc270", "#fff7d1", "#ffb96b"],
+  ship: ["", "#092331", "#00e5ff", "#efffff", "#ffea00"],
+  drone: ["", "#261634", "#a855ff", "#fff1ff", "#ffea00"],
+  crab: ["", "#321623", "#ff168f", "#fff6d6", "#ffea00"],
+  squid: ["", "#32200f", "#ffea00", "#fff7d1", "#ffea00"],
 };
 const atlas = new WeakMap<Document, Map<string, HTMLCanvasElement>>();
 /** Tiny canvases are baked once, then blitted. No images, filters or sprite DOM. */
