@@ -1,6 +1,6 @@
 /** One original interceptor body, equipped and posed on a finite pixel grid. */
-export type ShipPose = 'idle' | 'thrust' | 'bank-left' | 'bank-right';
-export declare const SHIP_PALETTE: readonly ['', '#092331', '#06c4ff', '#0b8eae', '#cdde00', '#fff5d7'];
+export type ShipPose = "idle" | "thrust" | "bank-left" | "bank-right";
+export declare const SHIP_PALETTE: readonly ["", "#092331", "#06c4ff", "#0b8eae", "#cdde00", "#fff5d7"];
 export declare const SHIP_ANCHOR: {
     x: number;
     y: number;
@@ -27,21 +27,21 @@ export declare const websiteSprites: {
             fill: "" | "#06c4ff" | "#092331" | "#0b8eae" | "#cdde00" | "#fff5d7";
         }[];
     };
-    'ship-twin': {
+    "ship-twin": {
         viewBox: string;
         layers: {
             d: string;
             fill: "" | "#06c4ff" | "#092331" | "#0b8eae" | "#cdde00" | "#fff5d7";
         }[];
     };
-    'ship-trident': {
+    "ship-trident": {
         viewBox: string;
         layers: {
             d: string;
             fill: "" | "#06c4ff" | "#092331" | "#0b8eae" | "#cdde00" | "#fff5d7";
         }[];
     };
-    'ship-overdrive': {
+    "ship-overdrive": {
         viewBox: string;
         layers: {
             d: string;
