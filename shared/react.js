@@ -1,1 +1,1 @@
-import{useEffect as r}from"react";function s(n){return function({active:t=!0,options:e}){return r(()=>{if(!t)return;let o=n(e);return o.start(),()=>o.destroy()},[t,e]),null}}export{s as createGameComponent};
+import{useEffect as r}from"react";function s(n){return function({active:e=!0,options:t}){return r(()=>{if(!e)return;let o=n(t);return o.start(),()=>o.destroy()},[e,t]),null}}export{s as createGameComponent};

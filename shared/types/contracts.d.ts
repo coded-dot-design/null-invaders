@@ -20,9 +20,12 @@ export interface BoardOptions {
     textSelector?: string;
     targetSelector?: string;
     excludeSelector?: string;
-    domMode?: "visual" | "text";
-    /** Native typography keeps binary replacements in the page's visual language. */
-    binaryStyle?: "native" | "neon";
+    /** Text is always mutated. Kept for existing direct-text integrations. */
+    domMode?: "text";
+    /** @deprecated Actual text always inherits its native page typography. */
+    binaryStyle?: "native";
+    /** Optional fade of actual binary text via CSS Highlights; full opacity without that API. */
+    binaryOpacity?: number;
     targetEffects?: "liquid" | "fade";
 }
 export interface RuntimeOptions extends BoardOptions {
@@ -97,12 +100,6 @@ export interface Glyph {
     spent: boolean;
     rect: Rect | null;
     range: Range | null;
-    typography?: {
-        font: string;
-        color: string;
-        ascent: number;
-        descent: number;
-    };
     bit: "0" | "1";
     effect?: "binary" | "erase";
 }
@@ -162,6 +159,8 @@ export interface GameSimulation<S extends GameStats = GameStats> {
     update(dt: number): void;
     draw(context: CanvasRenderingContext2D): void;
     scroll?(dx: number, dy: number): void;
+    /** Optional discrete commands; the runtime owns protected input and cleanup. */
+    action?(id: string): void;
     snapshot(): S;
 }
 export interface GameDefinition<S extends GameStats = GameStats> {
@@ -172,6 +171,11 @@ export interface GameDefinition<S extends GameStats = GameStats> {
     capabilities?: {
         fire?: boolean;
     };
+    actions?: readonly {
+        id: string;
+        key: string;
+        label: string;
+    }[];
     hud?: "arcade";
     create(context: GameContext): GameSimulation<S>;
 }

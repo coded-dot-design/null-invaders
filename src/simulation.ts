@@ -26,6 +26,7 @@ export interface NullInvadersStats extends GameStats {
   kills: number;
   alive: number;
   bullets: number;
+  supplies: number;
   weapon: number;
   weaponXP: number;
   nextWeaponXP: number | null;
@@ -43,6 +44,8 @@ import {
   EntityPool,
   chooseSpawn,
   translateEntities,
+  SupplyDrops,
+  clamp,
 } from "@coded-design/dom-virus";
 import {
   MAX_ENEMIES,
@@ -80,6 +83,9 @@ export function createGame(
   }));
   const enemies = enemyPool.active,
     bullets = bulletPool.active;
+  const supplies = new SupplyDrops();
+  let supplyIn = 6,
+    supplyTurn = 0;
   const old: Point = { x: 0, y: 0 };
   let score = 0,
     lives = 3,
@@ -138,6 +144,9 @@ export function createGame(
     player = { x: api.width * 0.5, y: api.height * 0.7, angle: -Math.PI / 2 };
     enemyPool.clear();
     bulletPool.clear();
+    supplies.reset();
+    supplyIn = 6;
+    supplyTurn = 0;
     score = 0;
     lives = 3;
     wave = 1;
@@ -158,6 +167,32 @@ export function createGame(
     comboIn = Math.max(0, comboIn - dt);
     if (!comboIn) streak = 0;
     api.move(player, dt, 360);
+    supplyIn -= dt;
+    if (supplyIn <= 0) {
+      supplyIn = 12;
+      const kind = supplyTurn++ % 2 ? "repair" : "charge";
+      if (
+        supplies.spawn(
+          {
+            x: clamp(player.x + 80, 25, api.width - 25),
+            y: clamp(player.y - 70, 90, api.height - 25),
+          },
+          kind,
+        )
+      )
+        api.emit("supply-drop", { kind });
+    }
+    supplies.update(dt, player, (kind) => {
+      if (kind === "charge") {
+        award(50, 8, player.x, player.y);
+        api.popup(player.x, player.y - 28, "+8 WEAPON XP", "upgrade");
+      } else {
+        lives = Math.min(3, lives + 1);
+        shield = Math.max(shield, 1);
+        api.popup(player.x, player.y - 28, "SHIELD RESTORED", "upgrade");
+      }
+      api.emit("supply-collected", { kind });
+    });
     if (intermission > 0) {
       intermission -= dt;
       if (intermission <= 0) {
@@ -320,6 +355,7 @@ export function createGame(
     }
   }
   function draw(ctx: CanvasRenderingContext2D) {
+    supplies.draw(ctx);
     ctx.lineCap = "square";
     ctx.lineWidth = 3;
     for (const b of bullets) {
@@ -392,6 +428,7 @@ export function createGame(
     scroll(dx, dy) {
       translateEntities(enemies, dx, dy);
       translateEntities(bullets, dx, dy);
+      supplies.scroll(dx, dy);
     },
     snapshot() {
       return {
@@ -401,6 +438,7 @@ export function createGame(
         kills,
         alive: enemies.length,
         bullets: bullets.length,
+        supplies: supplies.size,
         weapon,
         weaponXP: xp,
         nextWeaponXP: WEAPON_XP[weapon] ?? null,

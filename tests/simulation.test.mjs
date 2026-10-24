@@ -118,3 +118,23 @@ test("misses give no XP, projectiles stay bounded and expire", () => {
   for (let i = 0; i < 100; i++) tick();
   assert.equal(game.snapshot().bullets, 0);
 });
+
+test("charge drops require collection and grant weapon XP once", () => {
+  const { api, game, tick, events } = fixture();
+  for (let i = 0; i < 350; i++) tick();
+  assert.equal(game.snapshot().supplies, 1);
+  assert.equal(game.snapshot().weaponXP, 0);
+  api.move = (p) => {
+    p.x = 580;
+    p.y = 490;
+  };
+  tick();
+  assert.equal(game.snapshot().weaponXP, 8);
+  assert.equal(game.snapshot().weapon, 2);
+  assert.equal(game.snapshot().supplies, 0);
+  tick();
+  assert.equal(game.snapshot().weaponXP, 8);
+  assert.equal(events.filter((e) => e.type === "supply-collected").length, 1);
+  game.reset();
+  assert.equal(game.snapshot().supplies, 0);
+});
