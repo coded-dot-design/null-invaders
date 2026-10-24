@@ -1,5 +1,9 @@
 # 0.4.1
 
+## 0.5.4
+
+- Keep native 0/1 highlight text bright with a transparent background, so light page surfaces show through.
+
 ## 0.5.2
 
 - Vivid neon sprites and cyan binary highlights; consume movement/fire keys while playing, including when host chrome retains focus.
