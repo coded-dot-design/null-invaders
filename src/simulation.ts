@@ -260,6 +260,7 @@ export function createGame(
     if (api.firing && shotIn <= 0) {
       shotIn = fireInterval(weapon);
       muzzleUntil = api.time + 0.045;
+      if (bullets.length < MAX_BULLETS) api.emit("fire");
       for (const offset of weaponAngles(weapon)) {
         if (bullets.length >= MAX_BULLETS) break;
         const b = bulletPool.acquire();

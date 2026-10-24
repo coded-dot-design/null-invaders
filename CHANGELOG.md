@@ -1,5 +1,9 @@
 # 0.4.1
 
+## 0.7.0
+
+Add synthesized firing, hit, upgrade and wave cues; adopt shared sound/pause/minimize/Recall controls.
+
 ## 0.5.4
 
 - Keep native 0/1 highlight text bright with a transparent background, so light page surfaces show through.

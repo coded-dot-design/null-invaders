@@ -10,9 +10,10 @@
   "icon": "ship",
   "versionNote": "Four waves. One page. Increasing firepower.",
   "controls": [
-    "Mouse / WASD / arrows \u2014 fly and aim",
-    "Click / Space \u2014 fire",
-    "P \u2014 pause \u00b7 G \u2014 next factory \u00b7 Esc \u2014 Recall"
+    "Mouse / WASD / arrows — fly and aim",
+    "Click / Space — fire",
+    "P — pause · G — next factory · Esc — Recall",
+    "Scoreboard: sound · pause / resume · minimize · Recall"
   ],
   "facts": [
     {
@@ -55,7 +56,7 @@
   "code": "const game = createNullInvaders({\n  root: \"main\",\n  textSelector: \"h1, h2, p\",\n  targetSelector: \"[data-factory]\",\n  targetEffects: \"liquid\",\n});\ngame.start();\n// Later: game.destroy();",
   "importLine": "import { createNullInvaders } from \"@coded-design/null-invaders\";",
   "engine": "Shared TypeScript runtime",
-  "extra": "Three shields. Four waves. Factories reactivate between waves. Chained kills build a multiplier up to \u00d75; losing a shield resets the combo, but keeps your weapon.",
+  "extra": "Three shields. Four waves. Factories reactivate between waves. Chained kills build a multiplier up to ×5; losing a shield resets the combo, but keeps your weapon.",
   "sourcePaths": [
     "src/ship-art.ts",
     "src/simulation.ts",
