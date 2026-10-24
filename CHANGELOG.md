@@ -23,6 +23,10 @@
 - Update the integration guide and technical page to describe actual mutation and layout refresh.
 
 # Changelog
+
+## 0.5.3
+
+- Soften the site and game graphics to a flat color palette while retaining native attachments, raised controls and press feedback. Swarm colors remain unchanged.
 ## 0.3.1 — 2026-10-23
 
 - Add the Astro product/test page, system/light/dark themes, real game descriptions, measured package sizes, architecture diagrams, and creator attribution.

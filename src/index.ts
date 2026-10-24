@@ -17,7 +17,7 @@ export function createNullInvaders(
     {
       id: "null-invaders",
       title: "NULL INVADERS",
-      color: "#00e5ff",
+      color: "#06c4ff",
       hint: "Move: mouse / WASD · Fire: click / Space · G: next gate",
       capabilities: { fire: true },
       hud: "arcade",

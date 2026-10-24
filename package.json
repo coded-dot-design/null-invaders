@@ -1,6 +1,6 @@
 {
   "name": "@coded-design/null-invaders",
-  "version": "0.5.2",
+  "version": "0.5.3",
   "type": "module",
   "description": "Null Invaders: a tiny MIT-licensed DOM arcade game by coded.design",
   "license": "MIT",

@@ -95,23 +95,23 @@
   "palette": [
     {
       "label": "Ship / bits",
-      "color": "#00e5ff"
+      "color": "#06c4ff"
     },
     {
       "label": "Drone",
-      "color": "#a855ff"
+      "color": "#8573ee"
     },
     {
       "label": "Crab",
-      "color": "#ff168f"
+      "color": "#f4457a"
     },
     {
       "label": "Squid",
-      "color": "#ffea00"
+      "color": "#cdde00"
     },
     {
       "label": "Danger",
-      "color": "#ff343b"
+      "color": "#ee6875"
     }
   ]
 }

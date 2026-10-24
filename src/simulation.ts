@@ -267,14 +267,14 @@ export function createGame(
         ) {
           award(2, 1, x, y);
           if (streak) comboIn = 3;
-          api.burst(x, y, "#00e5ff", 5);
+          api.burst(x, y, "#06c4ff", 5);
           api.emit("letter", { score });
         }
         if (collision.kind === "enemy") {
           const target = collision.target;
           target.hp--;
           target.hitUntil = api.time + 0.08;
-          api.burst(x, y, "#ff168f", 6);
+          api.burst(x, y, "#f4457a", 6);
           if (target.hp <= 0) {
             const ix = enemies.indexOf(target);
             if (ix >= 0) {
@@ -292,7 +292,7 @@ export function createGame(
           const target = collision.target;
           api.board.damage(target, 20, { x, y });
           award(5, 2, x, y);
-          api.burst(x, y, "#ffea00", 8);
+          api.burst(x, y, "#cdde00", 8);
           if (target.health === 0) {
             award(150, 8, x, y - 10);
             api.emit("gate-destroyed", { target: target.id });
@@ -324,7 +324,7 @@ export function createGame(
         comboIn = 0;
         api.popup(player.x, player.y, "SHIELD LOST", "hurt");
         shield = 2;
-        api.burst(player.x, player.y, "#ff343b", 18);
+        api.burst(player.x, player.y, "#ee6875", 18);
         enemyPool.releaseAt(i);
         api.emit("hurt", { lives });
         if (lives <= 0) {
@@ -366,7 +366,7 @@ export function createGame(
       ctx.lineTo(b.x - b.vx * 0.014, b.y - b.vy * 0.014);
       ctx.stroke();
       ctx.strokeStyle =
-        weapon === 4 ? "#ffea00" : weapon === 3 ? "#a855ff" : "#00e5ff";
+        weapon === 4 ? "#cdde00" : weapon === 3 ? "#8573ee" : "#06c4ff";
       ctx.lineWidth = 2;
       ctx.stroke();
     }
@@ -393,7 +393,7 @@ export function createGame(
     ctx.translate(player.x, player.y);
     ctx.rotate(player.angle + Math.PI / 2);
     if (shield > 0) {
-      ctx.strokeStyle = "#00e5ff";
+      ctx.strokeStyle = "#06c4ff";
       ctx.globalAlpha = 0.6;
       ctx.lineWidth = 2;
       ctx.beginPath();
@@ -402,7 +402,7 @@ export function createGame(
       ctx.globalAlpha = 1;
     }
     // The silhouette grows weapon pods as firepower increases.
-    ctx.fillStyle = weapon === 4 ? "#ffea00" : "#00e5ff";
+    ctx.fillStyle = weapon === 4 ? "#cdde00" : "#06c4ff";
     if (weapon >= 2) {
       ctx.fillRect(-12, -10, 4, 10);
       ctx.fillRect(8, -10, 4, 10);
@@ -412,7 +412,7 @@ export function createGame(
       ctx.fillRect(-17, -4, 4, 10);
       ctx.fillRect(13, -4, 4, 10);
     }
-    ctx.fillStyle = "#ff343b";
+    ctx.fillStyle = "#ee6875";
     const flame = api.reducedMotion
       ? 5
       : 4 + (Math.floor(api.time * 18) % 3) * 2;
