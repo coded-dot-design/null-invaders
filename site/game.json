@@ -61,5 +61,35 @@
     "src/sprites.ts",
     "src/rules.ts",
     "shared/ORIGIN.json"
+  ],
+  "characters": [
+    {
+      "icon": "ship",
+      "name": "Your ship",
+      "role": "Pilot",
+      "rules": "Steer with the mouse or arrow keys. Hold Fire or Space. Shooting page text leaves real binary behind; weapon upgrades unlock at 8, 24 and 50 XP.",
+      "color": ""
+    },
+    {
+      "icon": "drone",
+      "name": "Drone",
+      "role": "Pursuer",
+      "rules": "The slowest alien shape. Spawns from live button gates and chases your ship with a sideways sway. One hit early; two from wave 3.",
+      "color": ""
+    },
+    {
+      "icon": "crab",
+      "name": "Crab",
+      "role": "Fast pursuer",
+      "rules": "Uses the same pursuit rules as the drone, with a higher movement speed. Contact costs a shield. Destroy its gate to stop that spawn source.",
+      "color": ""
+    },
+    {
+      "icon": "squid",
+      "name": "Squid",
+      "role": "Fastest pursuer",
+      "rules": "The fastest of the three alien shapes. Health rises with the wave, just like the other aliens; keep moving while firing.",
+      "color": ""
+    }
   ]
 }
