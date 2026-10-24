@@ -59,7 +59,10 @@ import {
   WEAPON_NAMES,
 } from "./rules.js";
 
-import { drawSprite, enemySprites } from "./sprites.js";
+import { drawSprite, drawShip, enemySprites } from "./sprites.js";
+
+import type { ShipPose } from "./ship-art.js";
+import { SHIP_MUZZLE } from "./ship-art.js";
 
 export function createGame(
   api: GameContext,
@@ -87,6 +90,11 @@ export function createGame(
   let supplyIn = 6,
     supplyTurn = 0;
   const old: Point = { x: 0, y: 0 };
+  let shipPose: ShipPose = "idle",
+    engineTime = 0,
+    bankUntil = 0,
+    bankSign = 0,
+    muzzleUntil = 0;
   let score = 0,
     lives = 3,
     wave = 1,
@@ -160,13 +168,52 @@ export function createGame(
     streak = 0;
     comboIn = 0;
     upgradeUntil = 0;
+    shipPose = "idle";
+    engineTime = 0;
+    bankUntil = 0;
+    bankSign = 0;
+    muzzleUntil = 0;
     api.board.resetTargets(waveHealth(wave));
   };
   function update(dt: number) {
     shield = Math.max(0, shield - dt);
     comboIn = Math.max(0, comboIn - dt);
     if (!comboIn) streak = 0;
+    const beforeMove = { x: player.x, y: player.y, angle: player.angle };
     api.move(player, dt, 360);
+    const intended =
+      api.input.mode === "mouse"
+        ? api.input.pointer.active
+        : [...api.input.keys].some((key) =>
+            [
+              "ArrowLeft",
+              "ArrowRight",
+              "ArrowUp",
+              "ArrowDown",
+              "KeyA",
+              "KeyD",
+              "KeyW",
+              "KeyS",
+            ].includes(key),
+          );
+    const moving = intended && distance(beforeMove, player) > 0.01;
+    if (moving) {
+      engineTime += dt;
+      const turn = Math.atan2(
+        Math.sin(player.angle - beforeMove.angle),
+        Math.cos(player.angle - beforeMove.angle),
+      );
+      if (Math.abs(turn) > 0.018) {
+        bankSign = Math.sign(turn);
+        bankUntil = api.time + 0.14;
+      }
+      shipPose =
+        !api.reducedMotion && api.time < bankUntil
+          ? bankSign < 0
+            ? "bank-left"
+            : "bank-right"
+          : "thrust";
+    } else shipPose = "idle";
     supplyIn -= dt;
     if (supplyIn <= 0) {
       supplyIn = 12;
@@ -212,14 +259,15 @@ export function createGame(
     }
     if (api.firing && shotIn <= 0) {
       shotIn = fireInterval(weapon);
+      muzzleUntil = api.time + 0.045;
       for (const offset of weaponAngles(weapon)) {
         if (bullets.length >= MAX_BULLETS) break;
         const b = bulletPool.acquire();
         if (!b) break;
         const a = player.angle + offset;
         Object.assign(b, {
-          x: player.x + Math.cos(a) * 16,
-          y: player.y + Math.sin(a) * 16,
+          x: player.x + Math.cos(a) * SHIP_MUZZLE,
+          y: player.y + Math.sin(a) * SHIP_MUZZLE,
           vx: Math.cos(a) * 660,
           vy: Math.sin(a) * 660,
           life: 1.5,
@@ -401,24 +449,18 @@ export function createGame(
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
-    // The silhouette grows weapon pods as firepower increases.
-    ctx.fillStyle = weapon === 4 ? "#cdde00" : "#06c4ff";
-    if (weapon >= 2) {
-      ctx.fillRect(-12, -10, 4, 10);
-      ctx.fillRect(8, -10, 4, 10);
+    drawShip(
+      ctx,
+      weapon,
+      shipPose,
+      api.reducedMotion ? 0 : Math.floor(engineTime * 12) % 2,
+      0,
+      0,
+    );
+    if (muzzleUntil > api.time && !api.reducedMotion) {
+      ctx.fillStyle = "#fff5d7";
+      ctx.fillRect(-1, -SHIP_MUZZLE - 1, 2, 3);
     }
-    if (weapon >= 3) ctx.fillRect(-2, -20, 4, 8);
-    if (weapon === 4) {
-      ctx.fillRect(-17, -4, 4, 10);
-      ctx.fillRect(13, -4, 4, 10);
-    }
-    ctx.fillStyle = "#ee6875";
-    const flame = api.reducedMotion
-      ? 5
-      : 4 + (Math.floor(api.time * 18) % 3) * 2;
-    ctx.fillRect(-7, 9, 4, flame);
-    ctx.fillRect(3, 9, 4, flame);
-    drawSprite(ctx, "ship", 0, 0, 0);
     ctx.restore();
   }
   return {

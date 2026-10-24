@@ -45,7 +45,7 @@
     },
     {
       "title": "A tiny cast, built from pixels.",
-      "body": "Three original alien silhouettes use two-frame animation. The interceptor gains weapon pods, engine flicker and a temporary shield. Art is baked into 15 \u00d7 16 canvas tiles and reused with image smoothing disabled. No image downloads, sprite DOM nodes or animation library."
+      "body": "The cyan interceptor keeps its split nose, stepped wings, lime core, and twin engines through Pulse, Twin, Trident, and Overdrive. Movement drives small thrust and banking frames. Finite pixel variants are baked once and reused with smoothing disabled; collision and firing geometry stay stable."
     },
     {
       "title": "Fast shots still hit thin letters.",
@@ -57,6 +57,7 @@
   "engine": "Shared TypeScript runtime",
   "extra": "Three shields. Four waves. Factories reactivate between waves. Chained kills build a multiplier up to \u00d75; losing a shield resets the combo, but keeps your weapon.",
   "sourcePaths": [
+    "src/ship-art.ts",
     "src/simulation.ts",
     "src/sprites.ts",
     "src/rules.ts",
@@ -65,7 +66,7 @@
   "characters": [
     {
       "icon": "ship",
-      "name": "Your ship",
+      "name": "Interceptor",
       "role": "Pilot",
       "rules": "Steer with the mouse or arrow keys. Hold Fire or Space. Shooting page text leaves real binary behind; weapon upgrades unlock at 8, 24 and 50 XP.",
       "color": ""
