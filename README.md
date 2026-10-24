@@ -157,3 +157,5 @@ MIT © 2026 Chris Cooley. Original character artwork is procedural and included 
 ## Version tags
 
 After checks pass on `main`, CI creates the tag matching `package.json` (for example `v0.3.0`) if it does not already exist. Existing tags never move. Bump the package version for the next release.
+
+Target beacons now attach to their actual elements. Native layout handles their scrolling, clipping and transforms. Mobile uses stationary rings and stable fills. See the [shared DOM ownership design](https://github.com/coded-dot-design/dom-virus/blob/main/docs/dom-ownership.md).
