@@ -1,5 +1,9 @@
 # 0.4.1
 
+## 0.7.2
+
+Mobile: the arrow D-pad becomes the shared analog thumbstick (8-way, deadzone + hysteresis), and Fire becomes Battlefield's round crosshair button with an exact 3D press. Movement and Fire can be held together. Uses the dom-virus engine 0.21.0 snapshot; the gzip budget grows by 2 KB for the shared controls.
+
 ## 0.7.0
 
 Add synthesized firing, hit, upgrade and wave cues; adopt shared sound/pause/minimize/Recall controls.
