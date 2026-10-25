@@ -1,5 +1,7 @@
 # Null Invaders · coded.design
 
+> **Play it and read about it on DOM Virus:** https://coded-dot-design.github.io/dom-virus/games/null-invaders/ — this README holds the full technical details.
+
 ## Play and develop the Astro site
 
 Product page: https://coded-dot-design.github.io/null-invaders/ (available after Pages is enabled and the deployment succeeds). Created by **Chris Cooley / coded.design**.
