@@ -110,8 +110,6 @@ screen morphs into `/games/null-invaders/`. "TEST A RELEASE" offers `v0.3.0`.
   scrolls the page and arrows move focus.
 - Sprites need one pale rim plus a dark silhouette to read on light and dark pages; filters and
   shadows were removed for cost.
-- `CHANGELOG.md` is out of order (a stray `# 0.4.1` at the top, `# Changelog` in the middle);
-  the newest entries are near the top.
 
 ## Keeping this file current
 

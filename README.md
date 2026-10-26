@@ -2,36 +2,11 @@
 
 > **Play it and read about it on DOM Virus:** https://coded-dot-design.github.io/dom-virus/games/null-invaders/ — this README holds the full technical details.
 
-## Play and develop the Astro site
-
-Product page: https://coded-dot-design.github.io/null-invaders/ (available after Pages is enabled and the deployment succeeds). Created by **Chris Cooley / coded.design**.
-
-Use Node **24** (`nvm use`), then run from this repository, where `package.json` lives:
-
-```sh
-npm ci
-npm run dev
-```
-
-Open the exact local URL Astro prints, including the `/null-invaders/` base path. `npm ci` uses the committed lockfile. `npm run dev:playground` keeps the original Vite regression playground available. The product site loads built game distributions; after editing game source, run `npm run build` and restart `npm run dev`.
-
-```sh
-npm run check
-npm run site:build
-npm run site:preview
-```
-
-`site:build` writes static output to `artifacts/site` and checks the launch script, styles and Pages asset paths. Pages builds run on every push to `main`; PR checks also build the product site. One-time setup: **Settings → Pages → Build and deployment → Source: GitHub Actions**. No custom domain or paid hosting is required for this public repository. If the deploy job ran before enabling Pages, rerun that failed job afterward.
-
-The page defaults to your system color scheme, with persistent light/dark overrides. Game launches are explicit and lazy-loaded. Recall destroys the active controller and restores eligible game-owned edits. Menu controls, code examples and the launcher are excluded from game targets.
-
-
-
-**The page is the game board.** A small, independent MIT-licensed DOM arcade game in the DOM VIRUS collection.
+**The page is the game board.** A small, independent MIT-licensed DOM arcade game in the DOM VIRUS collection. Created by **Chris Cooley / coded.design**.
 
 Fly a tiny interceptor through a real webpage. Shoot letters into binary, destroy button factories, and clear the aliens they release. Combat XP upgrades your weapon during a wave: Pulse, Twin, Trident, then four-shot Overdrive. Three lives; finishing wave four clears the page. Factories reactivate between waves.
 
-## The 0.3 shooter pass
+## Shooter features
 
 - Original two-frame pixel aliens, an animated interceptor, visible weapon pods, and brief enemy hit feedback. Sprites are baked into tiny canvas tiles once, then reused.
 - Swarm-inspired six-digit score panel, floating points, kill/active counters, combo scoring, and a weapon XP meter. Light/dark themes follow system preferences.
@@ -47,18 +22,22 @@ Fly a tiny interceptor through a real webpage. Shoot letters into binary, destro
 
 A letter gives 1 XP, an alien 4 XP, a factory hit 2 XP, a destroyed factory another 8 XP, and a wave clear 4 XP. Upgrades last for the run and reset on Restart. Three chained alien kills increase the combo multiplier, up to ×5; hits on letters keep the three-second combo window open. Losing a shield clears the combo.
 
+## Where the game lives
+
+This repository is the game package. The game page lives on the DOM Virus hub at https://coded-dot-design.github.io/dom-virus/games/null-invaders/. This repository's Pages workflow only publishes a redirect to that page; there is no per-game site to build. The hub reads `site/game.json` (page copy) and `site/art.json` (generated ship art) from here and loads the tagged package.
+
 ## Run locally
 
-Node **22.12+** or Node 24, npm, and Git:
+Use Node 24 (see `.nvmrc`), npm and Git:
 
 ```sh
 git clone https://github.com/coded-dot-design/null-invaders.git
 cd null-invaders
 npm ci
-npm run dev
+npm run dev:playground
 ```
 
-Open the Vite URL, normally **http://127.0.0.1:5173**, and click **Play**. This repository includes its own fictional test page. To switch between all three games, use the separate [DOM VIRUS playground](https://github.com/coded-dot-design/dom-virus).
+Open the URL Vite prints (normally **http://127.0.0.1:5173**) and click **Play**. The playground in `playground/` is a fictional test page; it does not ship in the package. With a sibling `dom-virus` checkout, Vite uses the live engine source; otherwise it uses the `shared/` snapshot.
 
 ## Embed without a build system
 
@@ -82,7 +61,7 @@ The import is deferred until the player clicks. Keep the MIT license with redist
 ## npm-compatible install
 
 ```sh
-npm install github:coded-dot-design/null-invaders#v0.3.0
+npm install github:coded-dot-design/null-invaders#v0.7.2
 ```
 
 ```js
@@ -132,23 +111,21 @@ Set `playing` from a user action. The adapter mounts only in an effect, destroys
 
 ## Controls
 
-Mouse or arrows/WASD: move and aim in the direction of travel. Hold click or Space to fire. Arrow/WASD input switches to keyboard control; pointer movement switches back. The HUD has an auto-fire toggle; touch devices also receive a D-pad.
+Mouse or arrows/WASD: move and aim in the direction of travel. Hold click or Space to fire. Arrow/WASD input switches to keyboard control; pointer movement switches back. The HUD has an auto-fire toggle. On touch devices, an analog joystick moves the ship and a round Fire button shoots; both can be held together.
 
 **P** pauses/resumes. **G** jumps to a gate. **Escape** or the HUD’s **×** (Recall) exits and restores the page. The HUD can be folded. Focusing a form field pauses play; modifier shortcuts and typing are not captured. Theme follows the system unless overridden. Reduced-motion preference removes particles, floating motion, sprite animation, hit flashes and decorative pulses; readable score feedback remains.
 
 ## Develop and verify
 
 ```sh
-npm run typecheck
-npm test
-npm run build
-npm run size
+npm run check            # typecheck, unit tests, build, package types
+npm run size             # gzip sizes against the budget
 npm run playground:build
 ```
 
-`src/simulation.ts` owns gameplay. `src/rules.ts` owns balance constants. `src/index.ts` exposes the factory. The engine, shared entity pools, factory selection and React lifecycle adapter are maintained once in DOM VIRUS. All engine and game implementation sources use strict TypeScript. Generated declarations preserve game-specific snapshot fields and ship with the package; the browser receives plain JavaScript. This repository includes a generated, versioned `shared/core.js` snapshot with its source fingerprint in `shared/ORIGIN.json`; do not edit that generated file. Builds use the snapshot, so this repo works independently. A sibling `dom-virus` checkout enables live source iteration in Vite. To refresh the engine snapshot, run `npm run build:engine && node scripts/sync-games.mjs null-invaders` in that checkout, then rebuild this game. A game build never silently replaces its pinned snapshot. A runtime update never silently changes a released game.
+`src/simulation.ts` owns gameplay. `src/rules.ts` owns balance constants. `src/index.ts` exposes the factory. The engine, shared entity pools, factory selection and React lifecycle adapter are maintained once in DOM VIRUS. All engine and game implementation sources use strict TypeScript. Generated declarations preserve game-specific snapshot fields and ship with the package; the browser receives plain JavaScript. This repository includes a generated, versioned `shared/core.js` snapshot with its source fingerprint in `shared/ORIGIN.json`; do not edit that generated file. Builds use the snapshot, so this repo works independently. A sibling `dom-virus` checkout enables live source iteration in Vite. To refresh the engine snapshot, run `npm run sync:games` in that checkout, then rebuild and test this game. A game build never silently replaces its pinned snapshot. A runtime update never silently changes a released game.
 
-The regular distribution is budgeted below **22 KB gzip including its runtime**. Runtime entities and geometry work are capped. Tests and Vite never ship in the package. See [shared performance notes](https://github.com/coded-dot-design/dom-virus/blob/main/PERFORMANCE.md) and [reference study](https://github.com/coded-dot-design/dom-virus/blob/main/REFERENCES.md).
+`dist/index.js` and `dist/react.js` are each budgeted at **24 KB gzip including the runtime**; `npm run size` (`scripts/size.mjs`) fails the build above that. Runtime entities and geometry work are capped. Tests and Vite never ship in the package. See [shared performance notes](https://github.com/coded-dot-design/dom-virus/blob/main/PERFORMANCE.md) and [reference study](https://github.com/coded-dot-design/dom-virus/blob/main/REFERENCES.md).
 
 ## First-cut support
 
@@ -158,7 +135,7 @@ MIT © 2026 Chris Cooley. Original character artwork is procedural and included 
 
 ## Version tags
 
-After checks pass on `main`, CI creates the tag matching `package.json` (for example `v0.3.0`) if it does not already exist. Existing tags never move. Bump the package version for the next release.
+After checks pass on `main`, CI creates the tag matching `package.json` (for example `v0.7.2`) if it does not already exist. Existing tags never move. Bump the package version for the next release.
 
 Target beacons now attach to their actual elements. Native layout handles their scrolling, clipping and transforms. Mobile uses stationary rings and stable fills. See the [shared DOM ownership design](https://github.com/coded-dot-design/dom-virus/blob/main/docs/dom-ownership.md).
 

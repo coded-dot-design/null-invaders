@@ -39,11 +39,8 @@ state is in [HANDOFF.md](HANDOFF.md). Move items to `CHANGELOG.md` when they shi
 
 ### Docs and content cleanup
 
-- `README.md` still documents `npm run site:build` / `site:preview` and Pages hosting of the
-  retired site, says touch devices "receive a D-pad", and quotes a 22 KB budget (now 24 KB).
 - `src/index.ts` hint says "G: next gate" while `site/game.json` says "G — next factory"; pick one
   word for players.
-- Reorder `CHANGELOG.md` (stray `# 0.4.1` at the top, `# Changelog` in the middle).
 
 ## Phase 3
 
