@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.0.0: on Fizlet
+
+The engine cut (DOM VIRUS ENGINE.md E3): Null Invaders runs on Fizlet 0.10.0 instead of the DOM VIRUS core snapshot. Same game, same numbers; the controller API (`createNullInvaders`, start/pause/resume/stop/destroy/getSnapshot) is unchanged.
+
+- **The rules are one Fizlet system** (`src/world.ts`), DOM-free, on typed arrays: a step never allocates (tested: 20,000 busy steps, no minor GC) and the same seed with the same inputs replays the same run (tested).
+- **Bricks:** the page as the board (`fizlet/board-page`: budgeted measurement in the read phase, a grid index, ledger writes), controls (`fizlet/input`, `fizlet/pad`), sound (`fizlet/sound`), supply drops and score / XP / weapon levels (`fizlet/rules`). Null Invaders' own combo, waves and factories stay in the game.
+- **Scoreboard in the Board UI kit** (DOM Battlefield's keys and readouts, the family's one button language): score, wave, shields, combo, weapon meter, a comms toast for upgrades, waves and the result. The touch stick and Fire key are the kit's pad.
+- **Removed:** `shared/` (the 51 KB core snapshot), the `targetEffects` and `document` options. Factories show their health as a level inside the button and a beacon ring.
+- **Size:** `dist/index.js` is 25,490 B gzip (budget 25,800 B); 0.7.2 was 22,940 B. The Board UI kit's CSS is 2,861 B of it: without it the build is 22,565 B, below 0.7.2.
+- **Tests:** rules, determinism and zero allocation in Node; the built package in Chromium (play, links and fields, pause, Recall restores the page byte for byte, game over, phone stick). CI runs on ubuntu-24.04.
+
 ## 0.7.2
 
 Mobile: the arrow D-pad becomes the shared analog thumbstick (8-way, deadzone + hysteresis), and Fire becomes Battlefield's round crosshair button with an exact 3D press. Movement and Fire can be held together. Uses the dom-virus engine 0.21.0 snapshot; the gzip budget grows by 2 KB for the shared controls.
