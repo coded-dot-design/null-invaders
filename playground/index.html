@@ -141,8 +141,9 @@
     let game;
     document.querySelector("#start").onclick = () => {
       game?.destroy();
-      game = createNullInvaders({ root: document.querySelector("#board") });
+      game = createNullInvaders({ root: document.querySelector("#board"), seed: Number(new URLSearchParams(location.search).get("seed")) || undefined });
       game.start();
+      window.nullInvaders = game; // tests and the console
     };
     document.querySelector("#stop").onclick = () => game?.destroy();
     if (import.meta.hot) import.meta.hot.dispose(() => game?.destroy());

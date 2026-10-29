@@ -1,1 +1,5 @@
-export declare const NullInvaders: (props: import("./core/react.js").GameComponentProps<import("./simulation.js").NullInvadersStats, import("./index.js").NullInvadersOptions>) => null;
+import type { NullInvadersOptions } from "./game.js";
+export declare function NullInvaders({ active, options }: {
+    active?: boolean;
+    options?: NullInvadersOptions;
+}): null;
