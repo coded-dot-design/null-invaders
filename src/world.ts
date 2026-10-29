@@ -57,8 +57,9 @@ export function segRect(x0: number, y0: number, x1: number, y1: number, l: numbe
   return lo <= hi ? lo : 2;
 }
 
-export function createWorld(e: Engine, board: Board) {
-  const s = new Float64Array(26), ctl = new Float64Array(7);
+/** `ctl`: the controls array to read (fizlet/arcade's, in the game); a fresh one by default (tests). */
+export function createWorld(e: Engine, board: Board, ctl: Float64Array = new Float64Array(11)) {
+  const s = new Float64Array(26);
   // Invaders: x, y, age, type, sway phase, hp, hit flash until; alive ones are 0 to `n[0]` − 1.
   const ex = new Float64Array(MAX_ENEMIES), ey = new Float64Array(MAX_ENEMIES), age = new Float64Array(MAX_ENEMIES);
   const kind = new Uint8Array(MAX_ENEMIES), phase = new Float64Array(MAX_ENEMIES), ehp = new Uint8Array(MAX_ENEMIES), flash = new Float64Array(MAX_ENEMIES);

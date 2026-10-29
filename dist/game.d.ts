@@ -1,4 +1,23 @@
 export type NullInvadersStatus = "idle" | "running" | "paused" | "won" | "gameover" | "destroyed";
+export interface NullInvadersStats {
+    score: number;
+    lives: number;
+    wave: number;
+    kills: number;
+    alive: number;
+    bullets: number;
+    supplies: number;
+    weapon: number;
+    weaponXP: number;
+    nextWeaponXP: number | null;
+    combo: number;
+    player: {
+        x: number;
+        y: number;
+        angle: number;
+    };
+    detail: string;
+}
 export interface NullInvadersOptions {
     /** The board: a selector or an element (default document.body). */
     root?: string | Element;
@@ -21,48 +40,28 @@ export interface NullInvadersOptions {
     onState?: (state: NullInvadersSnapshot) => void;
     onEvent?: (event: {
         type: string;
-        game: "null-invaders";
+        game: string;
         [key: string]: unknown;
     }) => void;
     onError?: (error: unknown) => void;
 }
-export interface NullInvadersStats {
-    score: number;
-    lives: number;
-    wave: number;
-    kills: number;
-    alive: number;
-    bullets: number;
-    supplies: number;
-    weapon: number;
-    weaponXP: number;
-    nextWeaponXP: number | null;
-    combo: number;
-    player: {
-        x: number;
-        y: number;
-        angle: number;
-    };
-    detail: string;
-    /** The page as the board: letters indexed, on screen, turned to bits, and the range reads the last
-     *  measurement made (never more than its budget). The same fields as 0.7.x. */
-    board: {
+export type NullInvadersSnapshot = Partial<NullInvadersStats> & {
+    id: string;
+    status: NullInvadersStatus;
+    elapsed: number;
+    frameMs: number;
+    maxFrameMs: number;
+    notice: string;
+    /** Letters indexed, on screen and turned to bits, and the range reads the last measurement made. */
+    board?: {
         indexed: number;
         visible: number;
         spent: number;
         measurements: number;
     };
     /** Sparks alive (at most 100). */
-    particles: number;
-}
-export interface NullInvadersSnapshot extends Partial<NullInvadersStats> {
-    id: "null-invaders";
-    status: NullInvadersStatus;
-    elapsed: number;
-    frameMs: number;
-    maxFrameMs: number;
-    notice: string;
-}
+    particles?: number;
+};
 export interface NullInvadersController {
     start(): NullInvadersSnapshot;
     pause(): void;

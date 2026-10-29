@@ -125,11 +125,11 @@ npm run playground:build
 ```
 
 - `src/world.ts` is the rules: ship, invaders, shots, factories, supplies and waves, as one DOM-free Fizlet system. Every running number lives in a typed array, so a step never allocates (a test runs 20,000 busy steps and sees no minor GC), and the same seed with the same inputs gives the same run.
-- `src/game.ts` is the page and the controller: one Fizlet engine per run, `fizlet/board-page` (the page as the board), `fizlet/input` and `fizlet/pad` (controls), `fizlet/sound`, `fizlet/rules` (supply drops; score, XP and weapon levels), and the Board UI kit for the scoreboard.
+- `src/game.ts` is the game's definition on `fizlet/arcade`, the shell shared by the page arcade games: one engine per run, the page as the board (`fizlet/board-page`), the scoreboard (Board UI kit), controls and touch pad, sound, sparks, popups and the controller. The game adds its scoreboard values, how it reacts to events and its art; `world.ts` uses `fizlet/rules` for supply drops and score, XP and weapon levels.
 - `src/rules.ts` holds the balance numbers; `src/ship-art.ts` and `src/sprites.ts` the art.
 - `vendor/fizlet/` is a generated snapshot of the engine with its provenance in `ORIGIN.json`. Never edit it: change coded-dot-design/fizlet, then `npm run sync` with a sibling `fizlet` checkout. CI checks every file against `ORIGIN.json`.
 
-`dist/index.js` and `dist/react.js` are budgeted at **26,000 B gzip**; `npm run size` (`scripts/size.mjs`) fails the build above that. 1.0.0 measures 25,748 B (0.7.2 on the DOM VIRUS core: 22,940 B). The kit's CSS (keys, readouts, toast, touch pad) is 2,834 B of it; the same build without that CSS is 22,914 B. Runtime entities and geometry work are capped. Tests and Vite never ship in the package.
+`dist/index.js` and `dist/react.js` are budgeted at **26,500 B gzip**; `npm run size` (`scripts/size.mjs`) fails the build above that. 1.0.0 measures 26,069 B (0.7.2 on the DOM VIRUS core: 22,940 B). The kit's CSS (keys, readouts, toast, touch pad) is 2,711 B of it; the same build without that CSS is 23,358 B. Runtime entities and geometry work are capped. Tests and Vite never ship in the package.
 
 ## First-cut support
 
