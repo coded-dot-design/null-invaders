@@ -41,6 +41,7 @@ try {
   let s = await state(page);
   assert.ok(s.score > 0 && s.weaponXP > 0, `scored (${s.score})`);
   assert.match(await page.locator("#board").innerText(), /[01]/, "letters became bits");
+  assert.ok(s.board.spent > 0 && s.board.spent <= s.board.indexed, `bits counted (${JSON.stringify(s.board)})`);
   assert.notEqual(await snapshot(page), before, "the page is in play");
   // A click on a link fires instead of following it.
   await page.click("#link");
@@ -73,6 +74,9 @@ try {
   await page.keyboard.up("Space");
   s = await state(page);
   assert.ok(s.frameMs < 4, `average frame work ${s.frameMs.toFixed(2)} ms`);
+  // The 0.7.x snapshot fields the hub reads: board measurements on budget, sparks capped.
+  assert.ok(s.board.indexed > 0 && s.board.measurements <= 900, JSON.stringify(s.board));
+  assert.ok(s.particles >= 0 && s.particles <= 100);
   await page.evaluate(() => window.game.destroy());
   assert.equal(await page.locator("[data-fizlet-host]").count(), 0);
   await page.close();

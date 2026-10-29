@@ -7,8 +7,9 @@ The engine cut (DOM VIRUS ENGINE.md E3): Null Invaders runs on Fizlet 0.10.0 ins
 - **The rules are one Fizlet system** (`src/world.ts`), DOM-free, on typed arrays: a step never allocates (tested: 20,000 busy steps, no minor GC) and the same seed with the same inputs replays the same run (tested).
 - **Bricks:** the page as the board (`fizlet/board-page`: budgeted measurement in the read phase, a grid index, ledger writes), controls (`fizlet/input`, `fizlet/pad`), sound (`fizlet/sound`), supply drops and score / XP / weapon levels (`fizlet/rules`). Null Invaders' own combo, waves and factories stay in the game.
 - **Scoreboard in the Board UI kit** (DOM Battlefield's keys and readouts, the family's one button language): score, wave, shields, combo, weapon meter, a comms toast for upgrades, waves and the result. The touch stick and Fire key are the kit's pad.
+- **Snapshot:** the same fields as 0.7.x, including `board` (letters indexed, visible, spent, range reads) and `particles`, so the hub's checks read it unchanged.
 - **Removed:** `shared/` (the 51 KB core snapshot), the `targetEffects` and `document` options. Factories show their health as a level inside the button and a beacon ring.
-- **Size:** `dist/index.js` is 25,653 B gzip (budget 26,000 B); 0.7.2 was 22,940 B. The Board UI kit's CSS is 2,838 B of it: without it the build is 22,815 B, below 0.7.2.
+- **Size:** `dist/index.js` is 25,748 B gzip (budget 26,000 B); 0.7.2 was 22,940 B. The Board UI kit's CSS is 2,834 B of it: without it the build is 22,914 B, below 0.7.2.
 - **Tests:** rules, determinism and zero allocation in Node; the built package in Chromium (play, links and fields, pause, Recall restores the page byte for byte, game over, phone stick). CI runs on ubuntu-24.04.
 
 ## 0.7.2

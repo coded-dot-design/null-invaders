@@ -55,6 +55,11 @@ export interface NullInvadersStats {
   combo: number;
   player: { x: number; y: number; angle: number };
   detail: string;
+  /** The page as the board: letters indexed, on screen, turned to bits, and the range reads the last
+   *  measurement made (never more than its budget). The same fields as 0.7.x. */
+  board: { indexed: number; visible: number; spent: number; measurements: number };
+  /** Sparks alive (at most 100). */
+  particles: number;
 }
 export interface NullInvadersSnapshot extends Partial<NullInvadersStats> {
   id: "null-invaders";
@@ -494,12 +499,17 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
 
     function stats(): NullInvadersStats {
       const w = world.weapon(), up = s[Wd.UPGRADE]! > s[Wd.TIME]!;
-      let gates = 0;
+      let gates = 0, visible = 0, spent = 0, sparks = 0;
       for (const t of board.targets) if (t.hp > 0) gates++;
+      const g = board.glyphs;
+      for (let i = 0; i < g.count; i++) (spent += g.spent[i]!), (visible += g.w[i]! > 0 ? 1 : 0);
+      for (let i = 0; i < SN; i++) if (kl[i]! > 0) sparks++;
       return {
         score: world.points.points, lives: s[Wd.LIVES]!, wave: s[Wd.WAVE]!, kills: s[Wd.KILLS]!, alive: world.enemies.count, bullets: world.bullets.count,
         supplies: world.supplies.count, weapon: w, weaponXP: world.points.xp, nextWeaponXP: WEAPON_XP[w] ?? null, combo: world.combo(),
         player: { x: s[Wd.X]!, y: s[Wd.Y]!, angle: s[Wd.A]! },
+        board: { indexed: g.count, visible, spent, measurements: board.reads },
+        particles: sparks,
         detail: s[Wd.BREAK]! > 0 ? "Wave clear · +250 · next wave incoming" : up ? `${WEAPON_NAMES[w - 1]} ONLINE · ${weaponAngles(w).length} shots per burst` : `${weaponAngles(w).length} SHOT · ${gates} FACTORIES · Space / click to fire`,
       };
     }

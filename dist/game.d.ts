@@ -44,6 +44,16 @@ export interface NullInvadersStats {
         angle: number;
     };
     detail: string;
+    /** The page as the board: letters indexed, on screen, turned to bits, and the range reads the last
+     *  measurement made (never more than its budget). The same fields as 0.7.x. */
+    board: {
+        indexed: number;
+        visible: number;
+        spent: number;
+        measurements: number;
+    };
+    /** Sparks alive (at most 100). */
+    particles: number;
 }
 export interface NullInvadersSnapshot extends Partial<NullInvadersStats> {
     id: "null-invaders";
