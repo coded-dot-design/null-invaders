@@ -39,6 +39,18 @@ export const POSES = ["idle", "thrust", "bank-left", "bank-right"] as const;
 export const SUPPLY_KINDS = ["charge", "repair"] as const;
 const SPEED = 360;
 
+/**
+ * Length of (x, y), bit for bit what Math.hypot returns for finite x, y, without its allocation
+ * (V8's Math.hypot allocates on every call, even optimized). It scales by the larger side as V8 does,
+ * so a run replays the same as before; a plain Math.sqrt(x * x + y * y) can differ in the last bit.
+ */
+function dist(x: number, y: number) {
+  if (x < 0) x = -x;
+  if (y < 0) y = -y;
+  const m = x > y ? x : y, r = x > y ? y / m : x / m;
+  return m === 0 ? 0 : m * Math.sqrt(1 + r * r);
+}
+
 /** Where segment (x0, y0) → (x1, y1) first enters the rect padded by `pad`, as 0..1, or 2 for a miss. */
 export function segRect(x0: number, y0: number, x1: number, y1: number, l: number, t: number, r: number, b: number, pad: number) {
   let lo = 0, hi = 1;
@@ -140,7 +152,7 @@ export function createWorld(e: Engine, board: Board, ctl: Float64Array = new Flo
       if (ctl[PON]) {
         dx = ctl[PX]! - s[X]!;
         dy = ctl[PY]! - s[Y]!;
-        const d = Math.hypot(dx, dy);
+        const d = dist(dx, dy);
         if (d > 4) {
           const step = Math.min(SPEED * dt, d);
           s[X]! += (dx / d) * step;
@@ -151,7 +163,7 @@ export function createWorld(e: Engine, board: Board, ctl: Float64Array = new Flo
     } else {
       dx = ctl[KX]!;
       dy = ctl[KY]!;
-      const d = Math.hypot(dx, dy);
+      const d = dist(dx, dy);
       if (d) {
         s[X]! += (dx / d) * SPEED * dt;
         s[Y]! += (dy / d) * SPEED * dt;
@@ -173,7 +185,7 @@ export function createWorld(e: Engine, board: Board, ctl: Float64Array = new Flo
     const ox = s[X]!, oy = s[Y]!, oa = s[A]!;
     move(dt);
     const intended = ctl[MODE] === 1 ? ctl[PON] === 1 : ctl[KX] !== 0 || ctl[KY] !== 0;
-    if (intended && Math.hypot(s[X]! - ox, s[Y]! - oy) > 0.01) {
+    if (intended && dist(s[X]! - ox, s[Y]! - oy) > 0.01) {
       s[ENGINE_T]! += dt;
       const turn = Math.atan2(Math.sin(s[A]! - oa), Math.cos(s[A]! - oa));
       if (Math.abs(turn) > 0.018) (s[BANK_SIGN] = Math.sign(turn)), (s[BANK_UNTIL] = time + 0.14);
@@ -284,7 +296,7 @@ export function createWorld(e: Engine, board: Board, ctl: Float64Array = new Flo
       const c = Math.cos(a), sn = Math.sin(a);
       ex[i]! += (c * speed - sn * sway) * dt;
       ey[i]! += (sn * speed + c * sway) * dt;
-      if (s[SHIELD]! <= 0 && Math.hypot(s[X]! - ex[i]!, s[Y]! - ey[i]!) < 24) {
+      if (s[SHIELD]! <= 0 && dist(s[X]! - ex[i]!, s[Y]! - ey[i]!) < 24) {
         s[LIVES]!--;
         s[STREAK] = s[COMBO_IN] = 0;
         s[SHIELD] = 2;
