@@ -8,19 +8,28 @@ import { minorGCs } from "./gc.mjs";
 
 /** A page: `letters` 10 px glyphs in a row at y = 100, plus factories (rects). Allocation-free hit. */
 function page({ letters = 40, targets = [] } = {}) {
-  const gx = new Float64Array(letters), spent = new Uint8Array(letters), n = new Float64Array(1);
+  const gx = new Float64Array(letters), spent = new Uint8Array(letters);
   for (let i = 0; i < letters; i++) gx[i] = 300 + i * 12;
   return {
     targets: targets.map(([x, y, w, h]) => ({ x, y, w, h, hp: 100 })),
     spent,
-    get t() { return n[0]; },
-    hit(x0, y0, x1, y1) {
+    hitAt(p, at) {
+      const x0 = p[at], y0 = p[at + 1], dx = p[at + 2] - x0, dy = p[at + 3] - y0;
       let best = -1;
-      n[0] = 2;
+      p[at + 4] = 2;
       for (let i = 0; i < letters; i++) {
         if (spent[i]) continue;
-        const t = W.segRect(x0, y0, x1, y1, gx[i], 100, gx[i] + 10, 116, 2);
-        if (t < n[0]) (n[0] = t), (best = i);
+        // The slab test inline (a helper call would box its number arguments).
+        let lo = 0, hi = 1;
+        for (let ax = 0; ax < 2; ax++) {
+          const s0 = ax ? y0 : x0, d = ax ? dy : dx, min = (ax ? 100 : gx[i]) - 2, max = (ax ? 116 : gx[i] + 10) + 2;
+          if (d) {
+            const u = (min - s0) / d, v = (max - s0) / d;
+            lo = Math.max(lo, u < v ? u : v);
+            hi = Math.min(hi, u < v ? v : u);
+          } else if (s0 < min || s0 > max) lo = 2;
+        }
+        if (lo <= hi && lo < p[at + 4]) (p[at + 4] = lo), (best = i);
       }
       return best;
     },

@@ -21,8 +21,9 @@ export interface Target {
 export interface Board {
   readonly targets: readonly Target[];
   /** First unspent glyph the segment touches, or -1; how far along it is `t`. */
-  hit(x0: number, y0: number, x1: number, y1: number): number;
-  readonly t: number;
+  /** First unspent glyph the segment p[i .. i + 3] touches, or -1; how far along it into p[i + 4].
+   *  (A typed form: a number passed to a call V8 doesn't inline boxes.) */
+  hitAt(p: Float64Array, i: number): number;
   consume(i: number, as?: "binary" | "erase"): boolean;
 }
 
@@ -66,6 +67,8 @@ export function createWorld(e: Engine, board: Board, ctl: Float64Array = new Flo
   // Shots: x, y, vx, vy, life; live ones are 0 to `n[1]` − 1.
   const bx = new Float64Array(MAX_BULLETS), by = new Float64Array(MAX_BULLETS), vx = new Float64Array(MAX_BULLETS), vy = new Float64Array(MAX_BULLETS), life = new Float64Array(MAX_BULLETS);
   const n = new Int32Array(2), EN = 0, BN = 1;
+  // A shot's step for the page query: x0, y0, x1, y1, and how far along the hit was.
+  const seg = new Float64Array(5);
   // Supply crates (fizlet/rules drops: the DOM VIRUS core's SupplyDrops numbers) and the score:
   // points, XP and the weapon level from XP 8 / 24 / 50. The combo is Null Invaders' own (kills
   // build it, letters only keep it alive), so the brick's combo is off.
@@ -224,8 +227,12 @@ export function createWorld(e: Engine, board: Board, ctl: Float64Array = new Flo
       const x0 = bx[i]!, y0 = by[i]!;
       const x1 = (bx[i] = x0 + vx[i]! * dt), y1 = (by[i] = y0 + vy[i]! * dt);
       life[i]! -= dt;
-      const glyph = board.hit(x0, y0, x1, y1);
-      let near = glyph >= 0 ? board.t : 2, what = glyph >= 0 ? 1 : 0, which = glyph;
+      seg[0] = x0;
+      seg[1] = y0;
+      seg[2] = x1;
+      seg[3] = y1;
+      const glyph = board.hitAt(seg, 0);
+      let near = glyph >= 0 ? seg[4]! : 2, what = glyph >= 0 ? 1 : 0, which = glyph;
       for (let j = 0; j < n[EN]!; j++) {
         const t = segRect(x0, y0, x1, y1, ex[j]! - 13, ey[j]! - 12, ex[j]! + 13, ey[j]! + 12, 2);
         if (t < near) (near = t), (what = 2), (which = j);
