@@ -1,6 +1,6 @@
 # Null Invaders · coded.design
 
-> **Play it and read about it on DOM Virus:** https://coded-dot-design.github.io/dom-virus/games/null-invaders/ — this README holds the full technical details.
+> **Play it and read about it on DOM Virus:** https://domvirus.com/games/null-invaders/ — this README holds the full technical details.
 
 **The page is the game board.** A small, independent MIT-licensed DOM arcade game in the DOM VIRUS collection. Created by **Chris Cooley / coded.design**.
 
@@ -24,7 +24,7 @@ A letter gives 1 XP, an alien 4 XP, a factory hit 2 XP, a destroyed factory anot
 
 ## Where the game lives
 
-This repository is the game package. The game page lives on the DOM Virus hub at https://coded-dot-design.github.io/dom-virus/games/null-invaders/. This repository's Pages workflow only publishes a redirect to that page; there is no per-game site to build. The hub reads `site/game.json` (page copy) and `site/art.json` (generated ship art) from here and loads the tagged package.
+This repository is the game package. The game page lives on the DOM Virus hub at https://domvirus.com/games/null-invaders/. This repository's Pages workflow only publishes a redirect to that page; there is no per-game site to build. The hub reads `site/game.json` (page copy) and `site/art.json` (generated ship art) from here and loads the tagged package.
 
 ## Run locally
 
