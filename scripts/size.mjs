@@ -1,6 +1,6 @@
-// The size budget (gzip), checked in CI. 1.0.0, the first build on Fizlet: dist/index.js is 26,069 B
+// The size budget (gzip), checked in CI. 1.0.0, the first build on Fizlet: dist/index.js is 26,302 B
 // (0.7.2 on the DOM VIRUS core: 22,940 B). The Board UI kit's CSS (keys, readouts, toast, touch pad:
-// the family's one button language) is 2,711 B of it; the same build without that CSS is 23,358 B.
+// the family's one button language) is 2,703 B of it; the same build without that CSS is 23,599 B.
 import { readFileSync } from "node:fs";
 import { gzipSync } from "node:zlib";
 const BUDGET = 26500;
