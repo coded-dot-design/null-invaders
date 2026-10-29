@@ -156,19 +156,25 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
     const [vScore, vWave, vLives, vCombo] = values as [HTMLElement, HTMLElement, HTMLElement, HTMLElement];
     const wl = $<HTMLElement>("[data-wl]"), wx = $<HTMLElement>("[data-wx]"), wb = $<HTMLElement>("[data-wb]");
     const canvas = $<HTMLCanvasElement>("canvas"), ctx = canvas.getContext("2d")!;
+    // The overlay is the one page change outside the engine's ledger: the scoreboard outlives the
+    // engine when a run ends (the page is already back), and the controller removes it on Recall.
     doc.documentElement.append(host);
-
-    const e = createEngine({
+    // The run's own keys (Escape, P, G) live as long as the overlay, not the engine.
+    const life = new AbortController();
+    let built: Engine | undefined;
+    try {
+    const e = (built = createEngine({
       root: host,
       seed: options.seed ?? (Math.random() * 2 ** 31) | 0,
       events: 256,
       pause: { offscreen: false },
       onError(err) {
-        notice = "The game stopped safely after an error.";
         stop();
+        notice = "The game stopped safely after an error.";
+        notify();
         options.onError?.(err);
       },
-    });
+    }));
     const board = boardPage(e, {
       root: resolveRoot(options.root),
       // Defaults: Fizlet's, plus the DOM VIRUS hooks pages already carry.
@@ -229,14 +235,17 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
       if (ev.repeat || (t instanceof Element && t.closest(PROTECTED) && !host.contains(t))) return;
       if (ev.code === "KeyP") ev.preventDefault(), status === "paused" ? resume() : pause();
       else if (ev.code === "KeyG" && live()) ev.preventDefault(), nextGate();
-    }, on);
+    }, { signal: life.signal, capture: true });
     win.addEventListener("blur", up, { signal: e.signal });
 
-    function nextGate() {
+    // G / Next gate: scroll to a live factory, preferring one off screen. Done in render (the
+    // scroll is a page write); the board re-measures on its own after the scroll.
+    let jump = 0, ending = 0;
+    const nextGate = () => (jump = 1);
+    function gate() {
       let pick: (typeof board.targets)[number] | undefined;
       for (const t of board.targets) if (t.hp > 0 && (!pick || (pick.w > 0 && !(t.w > 0)))) pick = t;
       pick?.el.scrollIntoView({ behavior: "instant", block: "center" });
-      board.refresh();
       emit("jump");
     }
 
@@ -342,9 +351,11 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
             case "wave:clear": toast(msg, "Wave clear · +250 · next wave incoming"); emit("wave-clear", { wave: ev.a }); break;
             case "spawn": emit("spawn"); break;
             case "fire": emit("fire"); break;
-            case "over": queueMicrotask(() => finish(ev.a === 1)); break;
           }
         }
+        // The run ended (read from the world, not the event ring, which may drop events when full).
+        if (s[Wd.OVER] && !ending) (ending = 1), queueMicrotask(() => finish(s[Wd.OVER] === 2));
+        if (jump) (jump = 0), gate();
         paintTargets();
         draw(eng.timing[0]!);
         hud();
@@ -500,11 +511,19 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
     p[P_Y] = innerHeight * 0.65;
     board.refresh();
     world.reset();
-    return { engine: e as Engine, host, ui, panel, msg, stats, syncPause, input, hud };
+    return { engine: e as Engine, life, host, ui, panel, msg, stats, syncPause, input, hud };
+    } catch (err) {
+      // A run that fails to start leaves nothing behind.
+      built?.destroy();
+      life.abort();
+      host.remove();
+      throw err;
+    }
   }
 
   // ---------- The controller ----------
   function teardown() {
+    run?.life.abort();
     run?.engine.destroy();
     run?.host.remove();
     run = null;

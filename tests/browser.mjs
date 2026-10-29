@@ -89,8 +89,21 @@ try {
   assert.match(await over.locator("[data-fizlet-host]").evaluate((h) => h.shadowRoot.textContent), /GAME OVER/);
   const host = await over.locator("[data-fizlet-host]").count();
   assert.equal(host, 1, "the scoreboard stays with the result");
-  await over.evaluate(() => window.game.stop());
+  // Escape still closes the result (the run's keys outlive its engine).
+  await over.keyboard.press("Escape");
+  assert.equal((await state(over)).status, "idle");
   assert.equal(await snapshot(over), bare, "the page is back after the run ends");
+  // A run that fails to start (a bad selector) leaves nothing behind.
+  const failed = await over.evaluate(() => {
+    try {
+      window.launch({ targetSelector: "[[bad" });
+      return "started";
+    } catch {
+      return window.game.getSnapshot().status;
+    }
+  });
+  assert.equal(failed, "idle");
+  assert.equal(await snapshot(over), bare, "a failed start changes nothing");
   await over.close();
 
   where = "phone";
@@ -112,7 +125,7 @@ try {
   await touch("touchEnd");
   assert.ok((await state(pp)).player.x > x0 + 40, "the stick flies the ship");
   await phone.close();
-  console.log("Null Invaders browser: play, links and fields, pause, Recall restores exactly, frame time, game over, phone stick passed.");
+  console.log("Null Invaders browser: play, links and fields, pause, Recall restores exactly, frame time, game over (Escape closes it), failed start leaves nothing, phone stick passed.");
 } catch (err) {
   console.error(`browser test failed at: ${where}`);
   throw err;
