@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.1
+
+E3 acceptance (`fe port-check`): no `Math.hypot` in the step, and the zero-allocation test in its own process. Same game: a run replays bit for bit what 1.0.0 played (same seeds, same inputs, same digest). Still on Fizlet 0.13.0.
+
+- **No `Math.hypot` in the step** (`src/world.ts`): V8's allocates on every call. A local `dist` returns exactly what `Math.hypot` returned (it scales by the larger side as V8 does), so the gameplay numbers don't move by a bit.
+- **Tests:** `npm test` runs files one at a time (`--test-concurrency=1`), and the zero-allocation test has its own file (`tests/zero-gc.test.mjs`), so no other test shapes what V8 learns before it counts GCs.
+- **Size:** `dist/index.js` is 26,493 B gzip (budget 27,000 B; 1.0.0 was 26,434 B).
+
 ## 1.0.0: on Fizlet
 
 The engine cut (DOM VIRUS ENGINE.md E3): Null Invaders runs on Fizlet 0.13.0 instead of the DOM VIRUS core snapshot. Same game, same numbers; the controller API (`createNullInvaders`, start/pause/resume/stop/destroy/getSnapshot) is unchanged.

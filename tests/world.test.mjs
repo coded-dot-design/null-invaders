@@ -1,61 +1,9 @@
 // The rules, headless: a Fizlet engine stepped by hand, a fake page (a row of letters, factories).
 import test from "node:test";
 import assert from "node:assert/strict";
-import { createEngine } from "../vendor/fizlet/index.ts";
 import * as W from "../src/world.ts";
 import { waveHealth } from "../src/rules.ts";
-import { minorGCs } from "./gc.mjs";
-
-/** A page: `letters` 10 px glyphs in a row at y = 100, plus factories (rects). Allocation-free hit. */
-function page({ letters = 40, targets = [] } = {}) {
-  const gx = new Float64Array(letters), spent = new Uint8Array(letters);
-  for (let i = 0; i < letters; i++) gx[i] = 300 + i * 12;
-  return {
-    targets: targets.map(([x, y, w, h]) => ({ x, y, w, h, hp: 100 })),
-    spent,
-    hitAt(p, at) {
-      const x0 = p[at], y0 = p[at + 1], dx = p[at + 2] - x0, dy = p[at + 3] - y0;
-      let best = -1;
-      p[at + 4] = 2;
-      for (let i = 0; i < letters; i++) {
-        if (spent[i]) continue;
-        // The slab test inline (a helper call would box its number arguments).
-        let lo = 0, hi = 1;
-        for (let ax = 0; ax < 2; ax++) {
-          const s0 = ax ? y0 : x0, d = ax ? dy : dx, min = (ax ? 100 : gx[i]) - 2, max = (ax ? 116 : gx[i] + 10) + 2;
-          if (d) {
-            const u = (min - s0) / d, v = (max - s0) / d;
-            lo = Math.max(lo, u < v ? u : v);
-            hi = Math.min(hi, u < v ? v : u);
-          } else if (s0 < min || s0 > max) lo = 2;
-        }
-        if (lo <= hi && lo < p[at + 4]) (p[at + 4] = lo), (best = i);
-      }
-      return best;
-    },
-    consume(i) {
-      if (spent[i]) return false;
-      return (spent[i] = 1), true;
-    },
-  };
-}
-function game(opts = {}, seed = 7) {
-  const e = createEngine({ seed, events: 512 });
-  const board = page(opts);
-  const w = W.createWorld(e, board);
-  w.s[W.W] = 1000;
-  w.s[W.H] = 800;
-  w.reset();
-  const seen = [];
-  const run = (sec, each) => {
-    for (let k = 0; k < Math.round(sec * 60); k++) {
-      each?.(w);
-      e.advance(1 / 60);
-      for (let i = 0; i < e.events.size; i++) seen.push(e.events.at(i).type);
-    }
-  };
-  return { e, w, board, seen, run };
-}
+import { game } from "./fixtures/world.mjs";
 
 test("the ship fires up the page: letters turn into bits and score 2 points and 1 XP each", () => {
   const { w, board, seen, run } = game();
@@ -166,24 +114,4 @@ test("same seed, same inputs: the same run (multiplayer-ready)", () => {
     return [...g.w.s, g.w.enemies.count, g.w.bullets.count, g.w.points.points].join(",");
   };
   assert.equal(play(), play());
-});
-
-test("a busy battle steps without allocating (no minor GC in 20 000 steps)", async () => {
-  const g = game({ targets: [[100, 600, 120, 40], [700, 500, 100, 30]] }, 3);
-  const steer = (wd) => {
-    wd.ctl[W.KX] = Math.sin(wd.s[W.TIME]);
-    wd.ctl[W.KY] = Math.cos(wd.s[W.TIME]);
-    wd.ctl[W.FIRE] = 1;
-    wd.s[W.SHIELD] = 9; // stay alive
-    for (const t of g.board.targets) if (t.hp < 20) t.hp = 100; // keep the factories up
-  };
-  g.run(5, steer); // warm up (JIT, pools)
-  assert.ok(g.w.enemies.count > 0 && g.w.bullets.count > 0, "the battle is busy");
-  const gcs = await minorGCs(() => {
-    for (let k = 0; k < 20000; k++) {
-      steer(g.w);
-      g.e.advance(1 / 60);
-    }
-  });
-  assert.equal(gcs, 0);
 });
