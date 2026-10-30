@@ -129,7 +129,7 @@ npm run playground:build
 - `src/rules.ts` holds the balance numbers; `src/ship-art.ts` and `src/sprites.ts` the art.
 - `vendor/fizlet/` is a generated snapshot of the engine with its provenance in `ORIGIN.json`. Never edit it: change coded-dot-design/fizlet, then `npm run sync` with a sibling `fizlet` checkout. CI checks every file against `ORIGIN.json`.
 
-`dist/index.js` and `dist/react.js` are budgeted at **27,000 B gzip**; `npm run size` (`scripts/size.mjs`) fails the build above that. 1.0.0 measures 26,434 B (0.7.2 on the DOM VIRUS core: 22,940 B). The kit's CSS (keys, readouts, toast, touch pad) is 2,702 B of it; the same build without that CSS is 23,732 B. Runtime entities and geometry work are capped. Tests and Vite never ship in the package.
+`dist/index.js` and `dist/react.js` are budgeted at **28,000 B gzip**; `npm run size` (`scripts/size.mjs`) fails the build above that. 1.0.2 (Fizlet 0.19.0) measures 27,499 B; 1.0.0 measured 26,434 B (0.7.2 on the DOM VIRUS core: 22,940 B). The kit's CSS (keys, readouts, toast, touch pad) is 2,906 B of it; the same build without that CSS is 24,535 B. Runtime entities and geometry work are capped. Tests and Vite never ship in the package.
 
 ## First-cut support
 
