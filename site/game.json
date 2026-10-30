@@ -10,10 +10,11 @@
   "icon": "ship",
   "versionNote": "Four waves. One page. Increasing firepower.",
   "controls": [
-    "Mouse / WASD / arrows — fly and aim",
-    "Click / Space — fire",
-    "P — pause · G — next factory · Esc — Recall",
-    "Scoreboard: sound · pause / resume · minimize · Recall"
+    "Arrows / WASD or mouse — fly and aim",
+    "Space (hold) or click — fire",
+    "P — pause / resume · G — next factory · Esc — Recall",
+    "Tab — scoreboard keys: sound · pause · minimize · Recall · Next gate · Restart · Auto fire",
+    "Keyboard only, with screen-reader updates for score, wave, shields and the result"
   ],
   "facts": [
     {

@@ -113,6 +113,22 @@ Set `playing` from a user action. The adapter mounts only in an effect, destroys
 
 Mouse or arrows/WASD: move and aim in the direction of travel. Hold click or Space to fire. Arrow/WASD input switches to keyboard control; pointer movement switches back. The HUD has an auto-fire toggle. On touch devices, the kit's touch pad (`fizlet/pad`): an analog stick moves the ship and a round Fire key shoots; both can be held together. While a run is live, a click on the page fires instead of following a link or pressing a button; the scoreboard, form fields and anything marked `data-virus-ignore` keep their clicks.
 
+### Keys
+
+The game plays with the keyboard alone:
+
+| Key | Action |
+| --- | --- |
+| Arrows / W A S D | Fly and aim (in the direction of travel) |
+| Space (hold) | Fire |
+| P | Pause / resume |
+| G | Jump to the next factory |
+| Escape | Recall: close the game and restore the page |
+| Tab / Shift+Tab | Reach the scoreboard keys after the page: sound, pause, minimize, Recall, Next gate, Restart, Auto fire |
+| Enter / Space on a key | Press it (while playing, Space fires instead) |
+
+Focus: starting leaves focus where it was (the game's keys work anywhere outside form fields); when a run ends, focus moves to **Restart**; Recall or a restart puts focus back on the control that started the game. Screen readers hear the score (at most once a second, the latest value), wave, shields, pause/resume, weapon upgrades and the result through one polite live region (`src/announce.ts`, the `fizlet/announce` contract).
+
 **P** pauses/resumes. **G** jumps to a gate. **Escape** or the HUD’s **×** (Recall) exits and restores the page. The HUD can be folded. Focusing a form field pauses play; modifier shortcuts and typing are not captured. Theme follows the system unless overridden. Reduced-motion preference removes particles, floating motion, sprite animation, hit flashes and decorative pulses; readable score feedback remains.
 
 ## Develop and verify
@@ -129,7 +145,7 @@ npm run playground:build
 - `src/rules.ts` holds the balance numbers; `src/ship-art.ts` and `src/sprites.ts` the art.
 - `vendor/fizlet/` is a generated snapshot of the engine with its provenance in `ORIGIN.json`. Never edit it: change coded-dot-design/fizlet, then `npm run sync` with a sibling `fizlet` checkout. CI checks every file against `ORIGIN.json`.
 
-`dist/index.js` and `dist/react.js` are budgeted at **28,541 B gzip**; `npm run size` (`scripts/size.mjs`) fails the build above that. 1.0.3 (Fizlet 0.20.0) measures 28,040 B; 1.0.2 (Fizlet 0.19.0) measured 27,499 B; 1.0.0 measured 26,434 B (0.7.2 on the DOM VIRUS core: 22,940 B). The kit's CSS (keys, readouts, toast, touch pad) is 2,906 B of 1.0.2's build; the same build without that CSS is 24,535 B. Runtime entities and geometry work are capped. Tests and Vite never ship in the package.
+`dist/index.js` and `dist/react.js` are budgeted at **29,304 B gzip**; `npm run size` (`scripts/size.mjs`) fails the build above that. Unreleased (accessible play) measures 28,803 B; 1.0.3 (Fizlet 0.20.0) measured 28,040 B; 1.0.2 (Fizlet 0.19.0) measured 27,499 B; 1.0.0 measured 26,434 B (0.7.2 on the DOM VIRUS core: 22,940 B). The kit's CSS (keys, readouts, toast, touch pad) is 2,906 B of 1.0.2's build; the same build without that CSS is 24,535 B. Runtime entities and geometry work are capped. Tests and Vite never ship in the package.
 
 ## First-cut support
 
