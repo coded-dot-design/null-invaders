@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.3
+
+On Fizlet 0.20.0 (was 0.19.0; `vendor/fizlet` from the v0.20.0 release, `bf42a8c`). Same game and rules: the vendored engine is the only code change.
+
+- **No pinch or double-tap zoom while you play** (Fizlet 0.20.0, `fizlet/touch`). While a run is live the page is the board, so a second finger, an iOS gesture or a double tap no longer zooms the page out of shape; one finger still flies and fires, taps and drags the scoreboard. The end of the run (or Recall) gives the page its zoom back. Checked in Chromium on a 390 × 844 touch phone: during a run a pinch and a double tap leave the page at scale 1 (the same pinch zooms it to 5× before the run, and on 1.0.2); after Recall the pinch zooms again and `<html>` is back to `touch-action: auto`.
+- **The scoreboard still drags**, with one finger on a phone and with the mouse at 1440 wide (checked in Chromium), and the drag does not zoom the page.
+- **Also from Fizlet 0.20.0:** the phone stick's math allocates nothing (the exact `hypot`, same bits as `Math.hypot`), and the shell's pause, resume and end go through one flow (the card behaves as before).
+- **Size:** `dist/index.js` is 28,040 B gzip (1.0.2 was 27,499 B, +541 B). Measured by taking each piece out of a scratch build: the touch lock in the shell +181 B, the kit's touch CSS +94 B, the rest of 0.20.0 (the flow contract, the exact `hypot` in the pad and the page hit test, the kernel's fps-cap timer) +266 B. The budget moves from 28,000 to 28,541 B (+541 B, the measured delta).
+
 ## 1.0.2
 
 On Fizlet 0.19.0 (was 0.13.0). Same game and rules: the vendored engine is the only code change.
