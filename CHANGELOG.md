@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+E14, accessible play. Same game and rules: no step, rule or replay changes; the vendored Fizlet is untouched (still 0.20.0).
+
+- **Keyboard only, start to finish:** Tab to Play, Enter to start; arrows/WASD fly, Space fires, P pauses, G jumps, Escape recalls; Tab reaches every scoreboard key (sound, pause, minimize, Recall, Next gate, Restart, Auto fire) with the kit's visible focus ring, and there is no trap. Focus now goes somewhere sensible: when a run ends it moves to **Restart**; Recall or a restart puts it back on the control that started the game (before, it fell to `<body>` when the overlay it was in went away). The keys are listed in the README (Keys) and the hub copy (`site/game.json` controls).
+- **Screen-reader announcements** through one polite live region (`src/announce.ts`, the same contract as Fizlet's coming `fizlet/announce` brick, so a later sync swaps the import): score (coalesced, at most one write a second, the latest value), wave, shields left, pause/resume, weapon upgrades, and the result (Game over / Stage clear with the final score, flushed at once). They come change-only from the scoreboard's writes (render), never from a step; nothing is allocated when nothing changed (the zero-allocation test is unchanged and green). The comms toast is no longer a second `role="status"` region, so nothing is read twice. Recall removes the region with the overlay, so the page still comes back byte for byte.
+- **axe-core** (serious + critical, Chromium, dark and light): the playground has 0 idle, running, paused and on a phone (before: 0; its one moderate "region" finding is fixed by making the bar a `<header>`). The scoreboard overlay adds none, also on the result.
+- **Tests:** `tests/announce.test.mjs` (region attributes, coalescing, the rate limit, re-announcing the same words, flush/destroy); `tests/browser.mjs` adds a keyboard-only run (start, play, pause from the scoreboard, Recall returns focus) and checks the game announces score, shields, pause and game over.
+- **Size:** `dist/index.js` is 28,803 B gzip (1.0.3: 28,040 B, +763 B: the announcer module and the change-only announcement and focus handling in `src/game.ts`); `dist/react.js` 28,881 B (was 28,120 B, +761 B). The budget moves by the measured delta, from 28,541 to 29,304 B.
+
 ## 1.0.3
 
 On Fizlet 0.20.0 (was 0.19.0; `vendor/fizlet` from the v0.20.0 release, `bf42a8c`). Same game and rules: the vendored engine is the only code change.

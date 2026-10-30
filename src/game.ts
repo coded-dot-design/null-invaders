@@ -4,6 +4,7 @@
 // the controller the DOM VIRUS hub drives) is fizlet/arcade; the rules are ./world. This file is
 // the game's definition: its scoreboard, how it reacts to what happens, and its art.
 import { arcade, CALM, TARGET_HP, VH, VW } from "../vendor/fizlet/arcade";
+import { announcer, type Announcer } from "./announce.js";
 import { WEAPON_NAMES, WEAPON_XP, weaponAngles } from "./rules.js";
 import { SHIP_MUZZLE } from "./ship-art.js";
 import { drawShip, drawSprite, enemySprites } from "./sprites.js";
@@ -76,14 +77,39 @@ export interface NullInvadersController {
 const COLOR = "#06c4ff";
 const ONLINE = WEAPON_NAMES.map((n) => `${n} ONLINE`);
 const pad = (n: number, k: number) => String(n).padStart(k, "0");
+const HINT = "Move: mouse / WASD · Fire: click / Space · G: next gate";
+const EDIT = "input,textarea,select,[contenteditable]";
 
 export function createNullInvaders(options: NullInvadersOptions = {}): NullInvadersController {
+  // Screen readers: score, wave, shields and the result go to one polite live region, change-only,
+  // from the scoreboard's writes (render), never from a step. One announcer per run: Recall removes it.
+  let a: Announcer | null = null, host: Element | null = null, opener: HTMLElement | null = null, ended = 0;
+  const said = new Float64Array(3);
+  const tell = (key: string, text: string) => (a ??= announcer()).say(key, text);
+  // Keyboard focus: the result focuses Restart; a new run or Recall gives focus back to whatever
+  // started the game (the overlay it was in is gone).
+  const onEvent: NullInvadersOptions["onEvent"] = (ev) => {
+    const f = document.activeElement as HTMLElement | null, lost = !f || f === document.body;
+    if (ev.type === "start") {
+      if (!lost && !f.closest("[data-fizlet-host]")) opener = f;
+      else if (lost) opener?.focus();
+      tell("status", `Game started. ${HINT}`);
+    } else if (ev.type === "pause" || ev.type === "resume") tell("status", ev.type === "pause" ? "Paused" : "Resumed");
+    else if (ev.type === "won" || ev.type === "gameover") {
+      if (!f?.closest(EDIT)) host?.shadowRoot?.querySelector<HTMLElement>("[data-a=restart]")?.focus();
+    } else if (ev.type === "recall") {
+      a?.destroy();
+      a = null;
+      if (lost) opener?.focus();
+    }
+    options.onEvent?.(ev);
+  };
   return arcade<NullInvadersStats>(
     {
       id: "null-invaders",
       title: "Null Invaders",
       color: COLOR,
-      hint: "Move: mouse / WASD · Fire: click / Space · G: next gate",
+      hint: HINT,
       touchHint: "Drag the stick to fly · hold the target key to fire",
       css: __KIT_CSS__,
       fire: true,
@@ -97,6 +123,11 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
         // The viewport and motion setting come from the shell's controls array; factory health goes back.
         const sync = () => ((s[Wd.W] = ctl[VW]!), (s[Wd.H] = ctl[VH]!), (s[Wd.REDUCED] = ctl[CALM]!), (ctl[TARGET_HP] = s[Wd.FACTORY_HP]!));
         ctx.engine.add({ read: sync });
+        // The comms toast stops being a live region: the announcer speaks for the game, once.
+        host = ctx.engine.root;
+        host?.shadowRoot?.querySelector(".msg")?.removeAttribute("role");
+        said.fill(NaN);
+        ended = 0;
         return {
           reset: () => (sync(), world.reset(), sync()),
           over: () => s[Wd.OVER]!,
@@ -104,7 +135,7 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
           react(ev) {
             switch (ev.type) {
               case "score": ctx.popup(ev.x, ev.y, ev.a, null, 0); break;
-              case "level": ctx.popup(s[Wd.X]!, s[Wd.Y]! - 26, 0, ONLINE[ev.a]!, 1); ctx.say(`${WEAPON_NAMES[ev.a]} ONLINE · ${weaponAngles(ev.a + 1).length} shots per burst`); ctx.emit("weapon-upgrade", { weapon: ev.a + 1, name: WEAPON_NAMES[ev.a] }); break;
+              case "level": ctx.popup(s[Wd.X]!, s[Wd.Y]! - 26, 0, ONLINE[ev.a]!, 1); ctx.say(`${WEAPON_NAMES[ev.a]} ONLINE · ${weaponAngles(ev.a + 1).length} shots per burst`); tell("weapon", `${WEAPON_NAMES[ev.a]} online`); ctx.emit("weapon-upgrade", { weapon: ev.a + 1, name: WEAPON_NAMES[ev.a] }); break;
               case "drop:collect": ctx.popup(s[Wd.X]!, s[Wd.Y]! - 28, 0, ev.a ? "SHIELD RESTORED" : "+8 WEAPON XP", 1); ctx.emit("supply-collected", { kind: Wd.SUPPLY_KINDS[ev.a] }); break;
               case "drop:spawn": ctx.emit("supply-drop", { kind: Wd.SUPPLY_KINDS[ev.a] }); break;
               case "hurt": ctx.popup(ev.x, ev.y, 0, "SHIELD LOST", 2); ctx.spark(ev.x, ev.y, 18, 3); ctx.emit("hurt", { lives: ev.a }); break;
@@ -114,17 +145,20 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
               case "gate": ctx.spark(ev.x, ev.y, 8, 2); break;
               case "gate:down": ctx.emit("gate-destroyed"); break;
               case "wave": ctx.say(`WAVE ${ev.a} · the factories are back`); ctx.emit("wave", { wave: ev.a }); break;
-              case "wave:clear": ctx.say("Wave clear · +250 · next wave incoming"); ctx.emit("wave-clear", { wave: ev.a }); break;
+              case "wave:clear": ctx.say("Wave clear · +250 · next wave incoming"); tell("wave", "Wave clear"); ctx.emit("wave-clear", { wave: ev.a }); break;
               case "spawn": ctx.emit("spawn"); break;
               case "fire": ctx.emit("fire"); break;
             }
           },
           hud(out) {
-            out[0] = world.points.points;
-            out[1] = s[Wd.WAVE]!;
-            out[2] = s[Wd.LIVES]!;
+            const score = (out[0] = world.points.points), wave = (out[1] = s[Wd.WAVE]!), lives = (out[2] = s[Wd.LIVES]!), over = s[Wd.OVER]!;
             out[3] = world.combo();
             out[4] = world.points.xp * 8 + world.weapon(); // the meter's change key
+            // Announce changes only (a run's first values are recorded silently: NaN !== NaN).
+            if (said[0] !== score) said[0] === said[0] && tell("score", `Score ${score}`), (said[0] = score);
+            if (said[1] !== wave) said[1] === said[1] && tell("wave", `Wave ${wave}`), (said[1] = wave);
+            if (said[2] !== lives) said[2] === said[2] && tell("lives", `${lives} ${lives === 1 ? "shield" : "shields"} left`), (said[2] = lives);
+            if (over && !ended) (ended = 1), tell("status", `${over === 2 ? "Stage clear" : "Game over"}. Final score ${score}. Restart or Escape`), a!.flush();
           },
           meter() {
             const w = world.weapon(), xp = world.points.xp, lo = WEAPON_XP[w - 1]!, hi = WEAPON_XP[w];
@@ -208,6 +242,6 @@ export function createNullInvaders(options: NullInvadersOptions = {}): NullInvad
         };
       },
     },
-    options,
+    { ...options, onEvent },
   );
 }
