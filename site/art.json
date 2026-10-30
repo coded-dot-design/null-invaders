@@ -1,6 +1,6 @@
 {
   "source": "null-invaders",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "sprites": {
     "ship": {
       "viewBox": "-3 -2 37 35",
