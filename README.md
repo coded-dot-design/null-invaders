@@ -2,7 +2,7 @@
 
 > **Play it and read about it on DOM Virus:** https://domvirus.com/games/null-invaders/ — this README holds the full technical details.
 
-**The page is the game board.** A small, independent MIT-licensed DOM arcade game in the DOM VIRUS collection, built on [Fizlet](https://github.com/coded-dot-design/fizlet). Created by **Chris Cooley / coded.design**.
+**The page is the game board.** A small, independent DOM arcade game in the DOM VIRUS collection, built on [Fizlet](https://github.com/fizlet/fzlt). Created by **Chris Cooley / coded.design**.
 
 Fly a tiny interceptor through a real webpage. Shoot letters into binary, destroy button factories, and clear the aliens they release. Combat XP upgrades your weapon during a wave: Pulse, Twin, Trident, then four-shot Overdrive. Three lives; finishing wave four clears the page. Factories reactivate between waves.
 
@@ -31,7 +31,7 @@ This repository is the game package. The game page lives on the DOM Virus hub at
 Use Node 24 (see `.nvmrc`), npm and Git:
 
 ```sh
-git clone https://github.com/coded-dot-design/null-invaders.git
+git clone https://github.com/fizlet/null-invaders.git
 cd null-invaders
 npm ci
 npm run dev:playground
@@ -56,12 +56,12 @@ Copy this repository's `dist/index.js` into your website assets. It contains the
 </script>
 ```
 
-The import is deferred until the player clicks. Keep the MIT license with redistributed code. No npm registry publication is required for this approach.
+The import is deferred until the player clicks. No npm registry publication is required for this approach.
 
 ## npm-compatible install
 
 ```sh
-npm install github:coded-dot-design/null-invaders#v1.0.0
+npm install github:fizlet/null-invaders#v1.0.0
 ```
 
 ```js
@@ -127,7 +127,7 @@ npm run playground:build
 - `src/world.ts` is the rules: ship, invaders, shots, factories, supplies and waves, as one DOM-free Fizlet system. Every running number lives in a typed array, so a step never allocates (a test runs 20,000 busy steps and sees no minor GC), and the same seed with the same inputs gives the same run.
 - `src/game.ts` is the game's definition on `fizlet/arcade`, the shell shared by the page arcade games: one engine per run, the page as the board (`fizlet/board-page`), the scoreboard (Board UI kit), controls and touch pad, sound, sparks, popups and the controller. The game adds its scoreboard values, how it reacts to events and its art; `world.ts` uses `fizlet/rules` for supply drops and score, XP and weapon levels.
 - `src/rules.ts` holds the balance numbers; `src/ship-art.ts` and `src/sprites.ts` the art.
-- `vendor/fizlet/` is a generated snapshot of the engine with its provenance in `ORIGIN.json`. Never edit it: change coded-dot-design/fizlet, then `npm run sync` with a sibling `fizlet` checkout. CI checks every file against `ORIGIN.json`.
+- `vendor/fizlet/` is a generated snapshot of the engine with its provenance in `ORIGIN.json`. Never edit it: change fizlet/fzlt, then `npm run sync` with a sibling `fizlet` checkout. CI checks every file against `ORIGIN.json`.
 
 `dist/index.js` and `dist/react.js` are budgeted at **28,541 B gzip**; `npm run size` (`scripts/size.mjs`) fails the build above that. 1.0.3 (Fizlet 0.20.0) measures 28,040 B; 1.0.2 (Fizlet 0.19.0) measured 27,499 B; 1.0.0 measured 26,434 B (0.7.2 on the DOM VIRUS core: 22,940 B). The kit's CSS (keys, readouts, toast, touch pad) is 2,906 B of 1.0.2's build; the same build without that CSS is 24,535 B. Runtime entities and geometry work are capped. Tests and Vite never ship in the package.
 
@@ -135,7 +135,7 @@ npm run playground:build
 
 Modern browsers with Canvas 2D, Shadow DOM, constructable stylesheets and Intl.Segmenter. CSS Highlights are optional and only colour already-mutated digits. Text replacement and Recall work without that API. Cross-origin frames and closed shadow roots are outside the board. Choose a content root and exclusions carefully for framework-driven or frequently changing pages.
 
-MIT © 2026 Chris Cooley. Original character artwork is procedural and included under the same license.
+© 2026 Chris Cooley. All rights reserved (LICENSE). Versions up to and including 1.0.3 were released under the MIT license, and copies of those keep it. The Fizlet engine in `vendor/fizlet/` stays MIT (THIRD_PARTY_NOTICES.md).
 
 ## Version tags
 

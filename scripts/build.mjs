@@ -34,7 +34,7 @@ for (const entry of ["index", "react"])
     legalComments: "none",
     external: ["react"],
     define: { __KIT_CSS__: JSON.stringify(kit) },
-    banner: { js: `/* Null Invaders ${version} · MIT © Chris Cooley · built on Fizlet */` },
+    banner: { js: `/* Null Invaders ${version} · © Chris Cooley, all rights reserved · built on Fizlet (MIT) */` },
   });
 execFileSync(process.execPath, ["--import", "tsx", "scripts/build-art.ts"], { stdio: "inherit" });
 console.log(`${name}@${version}: ESM + React builds and declarations ready.`);
