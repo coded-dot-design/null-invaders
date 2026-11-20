@@ -2,8 +2,8 @@
   "name": "@coded-design/null-invaders",
   "version": "1.0.3",
   "type": "module",
-  "description": "Null Invaders: a tiny MIT-licensed DOM arcade game by coded.design",
-  "license": "MIT",
+  "description": "Null Invaders: a tiny DOM arcade game by coded.design",
+  "license": "UNLICENSED",
   "author": "Chris Cooley",
   "sideEffects": [
     "./site-kit/**",
@@ -29,7 +29,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/coded-dot-design/null-invaders.git"
+    "url": "https://github.com/fizlet/null-invaders.git"
   },
   "engines": {
     "node": ">=22.23.4"
