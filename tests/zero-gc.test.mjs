@@ -1,5 +1,5 @@
 // The zero-allocation check in its own file, so `npm test` (one file at a time) and `fe port-check`
-// run it in a process where no other test shapes what V8 learns (fizlet-engine lesson T4).
+// run it in a process where no other test shapes what V8 learns (Fizlet factory lesson T4).
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as W from "../src/world.ts";
